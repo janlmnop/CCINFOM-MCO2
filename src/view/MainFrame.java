@@ -32,6 +32,8 @@ public class MainFrame extends JFrame {
     private ReturnEquipment returnEquipment = new ReturnEquipment();
     private ViewReports viewReports = new ViewReports();
     private ResponseReport responseReport = new ResponseReport();
+    private EquipmentReport equipmentReport = new EquipmentReport();
+    private EmployeeReport employeeReport = new EmployeeReport();
     private SuccessMessage successMessage = new SuccessMessage();
     private ErrorMessage errorMessage = new ErrorMessage();
 
@@ -60,6 +62,8 @@ public class MainFrame extends JFrame {
         mainPanel.add(returnEquipment, "return equipment");
         mainPanel.add(viewReports, "view reports");
         mainPanel.add(responseReport, "response report");
+        mainPanel.add(equipmentReport, "equipment report");
+        mainPanel.add(employeeReport, "employee report");
         mainPanel.add(successMessage, "success message");
         mainPanel.add(errorMessage, "error message");
 
@@ -98,13 +102,19 @@ public class MainFrame extends JFrame {
 
         /* from view reports menu */
         viewReports.getResponseButton().addActionListener(e -> showResponseReportsPane());
+        viewReports.getEquipmentButton().addActionListener(e -> showEquipmentReportsPane());
+        viewReports.getEmployeeButton().addActionListener(e -> showEmployeeReportsPane());
 
-        /* for back buttons in reports */
+        /* for back buttons in reports, equipments, & employees */
         responseReport.getBackTransButton().addActionListener(e -> showTransactionsMenu());
+        equipmentReport.getBackTransButton().addActionListener(e -> showTransactionsMenu());
+        employeeReport.getBackTransButton().addActionListener(e -> showTransactionsMenu());
 
         /* reports to transactions menu */
         responseReport.getBackRepsButton().addActionListener(e -> showViewReportsPane());
-
+        equipmentReport.getBackRepsButton().addActionListener(e -> showViewReportsPane());
+        employeeReport.getBackRepsButton().addActionListener(e -> showViewReportsPane());
+        
         /* add mainPanel to Frame */
         add(mainPanel);
         setVisible(true);
@@ -166,6 +176,16 @@ public class MainFrame extends JFrame {
         cardLayout.show(mainPanel, "response report");
     }
 
+    /*leads to equipment utilization reports pane */
+    private void showEquipmentReportsPane() {
+        cardLayout.show(mainPanel, "equipment report");
+    }
+
+    /* leads to employee deployment reports page */
+    private void showEmployeeReportsPane() {
+        cardLayout.show(mainPanel, "employee report");
+    }
+    
     /* leads to success message pane */
     private void showSuccessMessagePane() {
         cardLayout.show(mainPanel, "success message");
