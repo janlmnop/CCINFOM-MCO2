@@ -48,7 +48,7 @@ public class ResponseReport extends JPanel {
         
         /* title panel */
         JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        titleLabel.setText("Return Equipment");
+        titleLabel.setText("Response Report");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(Color.BLACK);
         titlePanel.add(titleLabel);
