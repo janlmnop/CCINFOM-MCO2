@@ -11,16 +11,10 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
-
-import model.Employee;
-import model.Equipment;
+import java.awt.event.*;
 
 
 public class ReturnEquipment extends JPanel {
-    /* ATTRIBUTES */
-    private ArrayList<Equipment> equipment;
-
     /* UI COMPONENTS */
     private JLabel titleLabel = new JLabel();
     private JButton backButton = new JButton();
@@ -31,9 +25,9 @@ public class ReturnEquipment extends JPanel {
     JLabel borrowerLabel = new JLabel();
     JLabel dateLabel = new JLabel();
 
-    JComboBox<String> itemField = new JComboBox<>();  
+    JComboBox<String> itemField;  
     JTextField qtyField = new JTextField();                       // NOTE : add input validation
-    JComboBox<String> borrowerField = new JComboBox<>();          // NOTE : change this too; it should come from the db; it should be Resident<>
+    JComboBox<String> borrowerField;
     JTextField dateField = new JTextField();
 
 
@@ -72,15 +66,17 @@ public class ReturnEquipment extends JPanel {
         gbcSpecs.anchor = GridBagConstraints.WEST;
 
         itemLabel.setText("Item:");
+        itemField = new JComboBox<>();
         itemField.setPreferredSize(new Dimension(255, 25));
 
         qtyLabel.setText("Quantity:");
         qtyField.setColumns(20);                                        // NOTE : add input validation
 
         borrowerLabel.setText("Borrower:");
+        borrowerField = new JComboBox<>();
         borrowerField.setPreferredSize(new Dimension(255, 25));
 
-        dateLabel.setText("Date (dd/MM/yyy):");
+        dateLabel.setText("Date (yyyy-MM-dd):");
         dateField.setColumns(20);
 
         gbcSpecs.gridx = 0; 
@@ -123,5 +119,33 @@ public class ReturnEquipment extends JPanel {
     /* gets the borrow button */
     public JButton getReturnButton() {
         return returnButton;
+    }
+
+    public JComboBox<String> getItemComboBox() {
+        return itemField;
+    }
+
+    public JComboBox<String> getBorrowerComboBox() {
+        return borrowerField;
+    }
+
+    public String getItem() {
+        return itemField.getSelectedItem().toString();
+    }
+
+    public String getQuantity() {
+        return qtyField.getText();
+    }
+
+    public String getBorrower() {
+        return borrowerField.getSelectedItem().toString();
+    }
+
+    public String getDate() {
+        return dateField.getText();
+    }
+
+    public void setActionListener(ActionListener listener) {
+        returnButton.addActionListener(listener);
     }
 }

@@ -10,28 +10,20 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
-
-import model.Equipment;
+import java.awt.event.*;
 
 
-public class BorrowEquipment extends JPanel {
-    /* ATTRIBUTES */
-    private ArrayList<Equipment> equipment;
-
-    // NOTE : these should come from the database; remove sometime soon
-    String[] colNames = new String[] {"Equipment Name", "Quantity", "Availability"};
-    String[][] sample = new String[][] {{"Medical Kits", "2", "Available"},
-                                        {"Ambulance", "0", "Not Available"},
-                                        {"Life Vests", "3", "Available"},
-                                        {"FlashLight", "1", "Available"}};
-
-             
+public class BorrowEquipment extends JPanel {            
     /* UI COMPONENTS */
     private JLabel titleLabel = new JLabel();
     private JTable equipmentTable;
     private JButton backButton = new JButton();
-    private JButton returnButton = new JButton();
+    private JButton borrowButton = new JButton();
+
+    private JComboBox<String> itemField;
+    private JComboBox<String> borrowerField;
+    private JTextField qtyField;
+    private JTextField dateField;
 
 
     public BorrowEquipment() {
@@ -55,19 +47,19 @@ public class BorrowEquipment extends JPanel {
         gbcButtons.anchor = GridBagConstraints.CENTER;
 
         backButton = new JButton("Back");
-        returnButton = new JButton("Borrow");
+        borrowButton = new JButton("Borrow");
 
         buttonPanel.add(backButton, gbcButtons);
         gbcButtons.gridx = 1;
-        buttonPanel.add(returnButton, gbcButtons);
+        buttonPanel.add(borrowButton, gbcButtons);
         gbcButtons.gridx = 2;
 
         /* table panel */
-        JPanel tablePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        equipmentTable = new JTable(sample, colNames);
-        JScrollPane scrollPane = new JScrollPane(equipmentTable);
-        scrollPane.setPreferredSize(new Dimension(600,250));
-        tablePanel.add(scrollPane);
+        // JPanel tablePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        // equipmentTable = new JTable(sample, colNames);
+        // JScrollPane scrollPane = new JScrollPane(equipmentTable);
+        // scrollPane.setPreferredSize(new Dimension(600,250));
+        // tablePanel.add(scrollPane);
 
         /* equipment specifications panel */
         JPanel equipmentSpecsPanel = new JPanel(new GridBagLayout());
@@ -76,20 +68,18 @@ public class BorrowEquipment extends JPanel {
         gbcSpecs.anchor = GridBagConstraints.WEST;
 
         JLabel itemLabel = new JLabel("Item:");
-        JComboBox<String> itemField = new JComboBox<String>();                              // NOTE : change this too; it should come from the db
+        itemField = new JComboBox<String>();                              
         itemField.setPreferredSize(new Dimension(255, 25));
-        // JTextField itemField = new JTextField(20);                               // aternative
 
         JLabel qtyLabel = new JLabel("Quantity:");
-        JTextField qtyField = new JTextField(20);                           // NOTE : add input validation
+        qtyField = new JTextField(20);                           // NOTE : add input validation
 
         JLabel borrowerLabel = new JLabel("Borrower:");
-        JComboBox<String> borrowerField = new JComboBox<String>();                          // NOTE : change this too; it should come from the db
+        borrowerField = new JComboBox<String>();                        
         borrowerField.setPreferredSize(new Dimension(255, 25));
-        // JTextField borrowerField = new JTextField(20);                           // alternative -> should have input validation
 
         JLabel dateLabel = new JLabel("Date (dd/MM/yyy):");
-        JTextField dateField = new JTextField(20);
+        dateField = new JTextField(20);
 
         gbcSpecs.gridx = 0; 
         gbcSpecs.gridy = 0;
@@ -120,7 +110,7 @@ public class BorrowEquipment extends JPanel {
         /* combine all panels */
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.add(tablePanel);
+        //centerPanel.add(tablePanel);
         centerPanel.add(equipmentSpecsPanel);
         add(centerPanel, BorderLayout.CENTER);   
         add(titlePanel, BorderLayout.NORTH);
@@ -134,6 +124,34 @@ public class BorrowEquipment extends JPanel {
 
     /* gets the return button */
     public JButton getBorrowButton() {
-        return returnButton;
+        return borrowButton;
+    }
+
+    public JComboBox<String> getItemComboBox() {
+        return itemField;
+    }
+
+    public JComboBox<String> getBorrowerComboBox() {
+        return borrowerField;
+    }
+
+    public String getItem() {
+        return itemField.getSelectedItem().toString();
+    }
+
+    public String getQuantity() {
+        return qtyField.getText();
+    }
+
+    public String getBorrower() {
+        return borrowerField.getSelectedItem().toString();
+    }
+
+    public String getDate() {
+        return dateField.getText();
+    }
+
+    public void setActionListener(ActionListener listener) {
+        borrowButton.addActionListener(listener);
     }
 }

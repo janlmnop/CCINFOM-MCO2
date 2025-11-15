@@ -5,10 +5,12 @@
  *  - call model, view, and controller here
  */
 
-import view.MainFrame;
+import view.*;
+import controller.*;
 
 public class Driver {
     public static void main(String[] args) throws Exception {
         MainFrame view = new MainFrame();
+        Controller controller = new Controller();
     }
 }

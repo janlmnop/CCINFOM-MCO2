@@ -24,6 +24,8 @@ public class AssignToShelter extends JPanel {
     private JButton backButton = new JButton("Back");
     private JButton assignButton = new JButton("Assign");
 
+    private JComboBox<String> employeeAssignedField;
+
     public AssignToShelter() {
         /* panel settings */
         setLayout(new BorderLayout());
@@ -67,7 +69,7 @@ public class AssignToShelter extends JPanel {
         JTextField timeField = new JTextField(20);
         
         JLabel employeeAssignedLabel = new JLabel("Employee Assigned:");
-        JComboBox<String> employeeAssignedField = new JComboBox<>();                                    // NOTE : change this too; it should come from the db
+        employeeAssignedField = new JComboBox<>();                                    // NOTE : change this too; it should come from the db
         employeeAssignedField.setPreferredSize(new Dimension(255, 25));
 
         gbcSpecs.gridx = 0; 
@@ -113,5 +115,9 @@ public class AssignToShelter extends JPanel {
 
     public JButton getAssignButton() {
         return assignButton;
+    }
+
+    public JComboBox<String> getEmployeeComboBox() {
+        return employeeAssignedField;
     }
 }

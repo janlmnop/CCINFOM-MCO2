@@ -13,6 +13,8 @@ package view;
 import java.awt.*;
 import javax.swing.*;
 
+import controller.*;
+
 
 public class MainFrame extends JFrame {
     /* ATTRIBUTES */
@@ -80,13 +82,6 @@ public class MainFrame extends JFrame {
         viewReports.getBackButton().addActionListener(e -> showTransactionsMenu());
 
         /* success message redirection */
-        rescueOperation.getUpdateButton().addActionListener(e -> showSuccessMessagePane());
-        assignToShelter.getAssignButton().addActionListener(e -> showSuccessMessagePane());
-        releaseFromShelter.getReleaseButton().addActionListener(e -> showSuccessMessagePane());
-        borrowEquipment.getBorrowButton().addActionListener(e -> showSuccessMessagePane());
-        // returnEquipment.getReturnButton().addActionListener(e -> showSuccessMessagePane());
-
-        /* part 2 */
         successMessage.getBackButton().addActionListener(e -> showTransactionsMenu());
 
 
@@ -95,11 +90,11 @@ public class MainFrame extends JFrame {
         // assignToShelter.getAssignButton().addActionListener(e -> showErrorMessagePane());
         // releaseFromShelter.getReleaseButton().addActionListener(e -> showErrorMessagePane());
         // borrowEquipment.getBorrowButton().addActionListener(e -> showErrorMessagePane());
-        returnEquipment.getReturnButton().addActionListener(e -> showErrorMessagePane());
+        // returnEquipment.getReturnButton().addActionListener(e -> showErrorMessagePane());
 
         /* error message redirections */
-        errorMessage.getBackButton().addActionListener(e -> showTransactionsMenu());
-        errorMessage.getRetryButton().addActionListener(e -> showResponseReportsPane());    // THIS IS WRONG; JUST A TEST
+        // errorMessage.getBackButton().addActionListener(e -> showTransactionsMenu());
+        // errorMessage.getRetryButton().addActionListener(e -> showReturnEquipmentPane());    // THIS IS WRONG; JUST A TEST
 
         /* from view reports menu */
         viewReports.getResponseButton().addActionListener(e -> showResponseReportsPane());
@@ -129,21 +124,36 @@ public class MainFrame extends JFrame {
     /* leads to assign to shelter pane */
     private void showAssignToShelterPane() {
         cardLayout.show(mainPanel, "assign to shelter");
+
+        Controller controller = new Controller(this, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment);
+        controller.loadEmployeeNames(assignToShelter);
     }
 
     /* leads to release from shelter pane */
     private void showReleaseFromShelterPane() {
         cardLayout.show(mainPanel, "release from shelter");
+
+        Controller controller = new Controller(this, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment);
+        controller.loadEmployeeNames(releaseFromShelter);
     }
 
     /* leads to borrow equipment pane */
     private void showBorrowEquipmentPane() {
         cardLayout.show(mainPanel, "borrow equipment");
+
+        Controller controller = new Controller(this, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment);
+        controller.loadEquipmentNames(borrowEquipment);
+        controller.loadResidentNames(borrowEquipment);
     }
+
 
     /* leads to return equipment pane */
     private void showReturnEquipmentPane() {
         cardLayout.show(mainPanel, "return equipment");
+
+        Controller controller = new Controller(this, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment);
+        controller.loadEquipmentNames(returnEquipment);
+        controller.loadResidentNames(returnEquipment);
     }
 
     /* leads to view reports pane */

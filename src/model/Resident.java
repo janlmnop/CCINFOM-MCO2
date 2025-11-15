@@ -1,5 +1,12 @@
 package model;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Resident extends Person {
     /* ATTRIBUTES */
     private int residentID;     // could be ULID
@@ -22,5 +29,27 @@ public class Resident extends Person {
 
 
     /* METHODS */
+    public List<String> getResidentList() {
+        List<String> list = new ArrayList<>();
 
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
+
+            PreparedStatement pstmt = conn.prepareStatement("SELECT CONCAT(first_name, \" \", last_name) AS full_name FROM resident ORDER BY first_name, last_name ASC");
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                list.add(rs.getString("full_name"));
+            }
+
+            rs.close();
+            pstmt.close();
+            conn.close();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        return list;
+    }
 }

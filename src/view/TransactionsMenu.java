@@ -9,6 +9,7 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 
 public class TransactionsMenu extends JPanel {
@@ -127,5 +128,9 @@ public class TransactionsMenu extends JPanel {
     /* gets view report button */
     public JButton getBtnReports() {
         return btnReports;
+    }
+
+    public void setActionListener(ActionListener listener) {
+        btnT5.addActionListener(listener);
     }
 }

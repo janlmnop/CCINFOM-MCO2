@@ -24,7 +24,7 @@ public class RescueOperation extends JPanel {
     private JLabel employeesLabel = new JLabel();
     private JLabel residentsLabel = new JLabel();
 
-    private JComboBox<String> typeField = new JComboBox<>();
+    private JTextField typeField = new JTextField();
     private JTextField durationField = new JTextField();
     private JTextField dateField = new JTextField();
     private JTextField timeField = new JTextField();
@@ -68,7 +68,7 @@ public class RescueOperation extends JPanel {
         gbcSpecs.anchor = GridBagConstraints.WEST;
 
         typeLabel.setText("Disaster Type: ");
-        typeField.setPreferredSize(new Dimension(255, 25));                   
+        typeField.setColumns(20);                
 
         dateLabel.setText("Date (dd/MM/yyy):");
         dateField.setColumns(20);

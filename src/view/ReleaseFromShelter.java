@@ -24,6 +24,8 @@ public class ReleaseFromShelter extends JPanel {
     private JButton backButton = new JButton("Back");
     private JButton releaseButton = new JButton("Release");
 
+    private JComboBox<String> employeeAssignedField;
+
     /* constructor */
     public ReleaseFromShelter() {
         /* panel settings */
@@ -68,7 +70,7 @@ public class ReleaseFromShelter extends JPanel {
         JTextField timeField = new JTextField(20);
         
         JLabel employeeAssignedLabel = new JLabel("Employee Assigned:");
-        JComboBox<String> employeeAssignedField = new JComboBox<>();                                    // NOTE : change this too; it should come from the db
+        employeeAssignedField = new JComboBox<>();                                    // NOTE : change this too; it should come from the db
         employeeAssignedField.setPreferredSize(new Dimension(255, 25));
 
         gbcSpecs.gridx = 0; 
@@ -114,5 +116,9 @@ public class ReleaseFromShelter extends JPanel {
 
     public JButton getReleaseButton() {
         return releaseButton;
+    }
+
+    public JComboBox<String> getEmployeeComboBox() {
+        return employeeAssignedField;
     }
 }

@@ -1,16 +1,21 @@
 package model;
 
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Employee extends Person {
     /* ATTRIBUTES */
     private int employeeID;         // or ULID
     private String committee;
     private String position;
     private boolean availability;   // T for available and F for not || if you want to declare an enum, it should be a separate class
+    private String password;
 
 
     /* CONSTRUCTOR(S) */    
     public Employee() {
-
+    
     }
 
 
@@ -31,6 +36,10 @@ public class Employee extends Person {
         return availability;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public void setEmployeeID(int employeeID) {
         this.employeeID = employeeID;
     }
@@ -47,7 +56,32 @@ public class Employee extends Person {
         this.availability = availability;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     /* METHODS */
+    public List<String> getEmployeeList() {
+        List<String> list = new ArrayList<>();
 
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
+
+            PreparedStatement pstmt = conn.prepareStatement("SELECT CONCAT(first_name, \" \", last_name) AS full_name FROM employee ORDER BY first_name, last_name ASC");
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                list.add(rs.getString("full_name"));
+            }
+
+            rs.close();
+            pstmt.close();
+            conn.close();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        return list;
+    }
 }
