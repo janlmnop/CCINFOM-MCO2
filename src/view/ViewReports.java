@@ -83,7 +83,7 @@ public class ViewReports extends JPanel {
     }
 
     public JButton getEquipmentButton() {
-        return shelterButton;
+        return equipmentButton;
     }
 
     public JButton getEmployeeButton() {
