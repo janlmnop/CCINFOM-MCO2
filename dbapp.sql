@@ -1,3 +1,6 @@
+CREATE DATABASE  IF NOT EXISTS `dbapp` /*!40100 DEFAULT CHARACTER SET latin1 */;
+USE `dbapp`;
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS response_employee;
@@ -10,9 +13,6 @@ DROP TABLE IF EXISTS resident;
 DROP TABLE IF EXISTS equipment;
 
 SET FOREIGN_KEY_CHECKS = 1;
-
-CREATE DATABASE  IF NOT EXISTS `dbapp` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `dbapp`;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -91,12 +91,22 @@ CREATE TABLE response (
     response_end DateTime NOT NULL,
     PRIMARY KEY (response_id),
     FOREIGN KEY (disaster_id) REFERENCES disaster(disaster_id),
-    FOREIGN KEY (shelter_id) REFERENCES shelter(shelter_id));
+    FOREIGN KEY (shelter_id) REFERENCES shelter(shelter_id)
+	FOREIGN KEY (employee_id) REFERENCES employee(employee_id));
 
 -- drop data for response
 INSERT INTO response VALUES
 (1, 1, 1, 1, "RS", "2025-01-01 12:12:12", "2025-01-02 12:12:12"),
 (2, 2, 2, 2, "E", "2025-02-02 07:07:07", "2025-07-03 07:07:07");
+
+-- response_resident junction table
+CREATE TABLE response_resident (
+	response_id int(10) NOT NULL,
+    resident_id int(10) NOT NULL,
+    role enum("rescued", "evacuated", "injured", "volunteer") NOT NULL,
+    PRIMARY KEY (response_id, resident_id),
+    FOREIGN KEY (response_id) REFERENCES response(response_id),
+    FOREIGN KEY (resident_id) REFERENCES resident(resident_id));
 
 -- disaster table
 CREATE TABLE disaster (
