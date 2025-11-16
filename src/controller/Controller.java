@@ -7,11 +7,11 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
-import javax.swing.*;
 
 import view.*;
 import model.Employee;
 import model.Resident;
+import model.Response;
 import model.Shelter;
 import model.Equipment;
 
@@ -23,14 +23,7 @@ public class Controller implements ActionListener, DocumentListener {
     private BorrowEquipment bEquip;
     private ReturnEquipment rEquip;
 
-    private Employee employee;
-    private Resident resident;
-    private Shelter shelter;
-    private Equipment equipment;
-
-    public Controller() {
-
-    }
+    public Controller() {}
 
     public Controller(MainFrame mainFrame, RescueOperation resOp, AssignToShelter asShelter, ReleaseFromShelter reShelter, BorrowEquipment bEquip, ReturnEquipment rEquip) {
         this.mainFrame = mainFrame;
@@ -50,6 +43,17 @@ public class Controller implements ActionListener, DocumentListener {
 
     @Override
     public void actionPerformed (ActionEvent e) {
+        // rescue operation
+        if (e.getSource() == resOp.getUpdateButton()) {
+            String disasterType = resOp.getDisasterType();
+            String startDateTime = resOp.getStartDateTime();
+            String endDateTime = resOp.getEndDateTime();
+            String employeeAssigned = resOp.getEmployeeAssigned();
+            String rescuedResident = resOp.getRescuedResident();
+
+            rescueOperation(disasterType, startDateTime, endDateTime, employeeAssigned, rescuedResident);
+        }
+
         // borrow equipment
         if (e.getSource() == bEquip.getBorrowButton()) {
             String item = bEquip.getItem();
@@ -149,6 +153,43 @@ public class Controller implements ActionListener, DocumentListener {
     }
 
     /* DB MANIPULATION ON ACTUAL TRANSACTIONS */
+    public int rescueOperation(String disasterType, String startDateTime, String endDateTime, String employeeAssigned, String rescuedResident) {
+         try {
+            Response thisResponse = new Response();
+
+            // 1. connect to our database
+            Connection conn;
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
+
+            // 2.1 to get the next response ID
+            PreparedStatement pstmt = conn.prepareStatement("SELECT MAX(response_id) + 1 AS responseID FROM response");
+            ResultSet rst = pstmt.executeQuery();   // result set gets the value after excuting the query
+            while (rst.next()) {
+                thisResponse.setResponseID(rst.getInt("responseID"));
+            }
+
+            // 2.2 log response details
+            pstmt = conn.prepareStatement("INSERT INTO response (response_id, response_type, response_start, response_end) VALUES (?, ?, ?, ?)");
+            pstmt.setInt(1, thisResponse.getResponseID());
+            pstmt.setString(2, "RS");   // always rescue
+            pstmt.setString(3, startDateTime);
+            pstmt.setString(4, endDateTime);
+
+            pstmt.executeUpdate();
+
+            // close assets
+            pstmt.close();
+            conn.close();
+
+            System.out.println("Success!");
+            return 1;
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return 0;
+        }
+    }
+
     public int borrowEquipment(String item, String qty, String borrower, String date) {
         try {
             Equipment thisEquipment = new Equipment();

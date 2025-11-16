@@ -2,34 +2,26 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.awt.event.*;
 
-import model.Employee;
-import model.Resident;
 
 public class RescueOperation extends JPanel {
-    /* attributes */
-    private ArrayList<Employee> employees;
-    private ArrayList<Resident> residents;
-
     /* UI components */
     private JLabel titleLabel = new JLabel();
     private JButton backButton = new JButton();
     private JButton updateButton = new JButton();
 
     private JLabel typeLabel = new JLabel();
-    private JLabel durationLabel = new JLabel();
-    private JLabel dateLabel = new JLabel();
-    private JLabel timeLabel = new JLabel();
-    private JLabel employeesLabel = new JLabel();
-    private JLabel residentsLabel = new JLabel();
+    private JLabel startLabel = new JLabel();
+    private JLabel endLabel = new JLabel();
+    private JLabel employeeLabel = new JLabel();
+    private JLabel residentLabel = new JLabel();
 
-    private JTextField typeField = new JTextField();
-    private JTextField durationField = new JTextField();
-    private JTextField dateField = new JTextField();
-    private JTextField timeField = new JTextField();
-    private JTextField employeesField = new JTextField();
-    private JTextField residentsField = new JTextField();
+    private JTextField typeField;
+    private JTextField startField;
+    private JTextField endField;
+    private JTextField employeeField;
+    private JTextField residentField;
 
 
 
@@ -67,23 +59,25 @@ public class RescueOperation extends JPanel {
         gbcSpecs.insets = new Insets(10, 10, 10, 10);
         gbcSpecs.anchor = GridBagConstraints.WEST;
 
+        typeField = new JTextField();
         typeLabel.setText("Disaster Type: ");
         typeField.setColumns(20);                
 
-        dateLabel.setText("Date (dd/MM/yyy):");
-        dateField.setColumns(20);
+        startField = new JTextField();
+        startLabel.setText("Start Date & Time (YYYY-MM-DD HH:MI:SS):");
+        startField.setColumns(20);
 
-        timeLabel.setText("Time (24:59):");
-        timeField.setColumns(20);
-
-        durationLabel.setText("Response Duration"); 
-        durationField.setColumns(20);
+        endField = new JTextField();
+        endLabel.setText("Start Date & Time (YYYY-MM-DD HH:MI:SS):");
+        endField.setColumns(20);
         
-        employeesLabel.setText("Employee(s) Assigned:");                          
-        employeesField.setColumns(20);
+        employeeField = new JTextField();
+        employeeLabel.setText("Employee(s) Assigned:");                          
+        employeeField.setColumns(20);
 
-        residentsLabel.setText("Rescued Resident(s):");
-        residentsField.setColumns(20);
+        residentField = new JTextField();
+        residentLabel.setText("Rescued Resident(s):");
+        residentField.setColumns(20);
 
         gbcSpecs.gridx = 0; 
         gbcSpecs.gridy = 0;
@@ -93,33 +87,27 @@ public class RescueOperation extends JPanel {
 
         gbcSpecs.gridx = 0; 
         gbcSpecs.gridy = 1;
-        fieldsPanel.add(dateLabel, gbcSpecs);
+        fieldsPanel.add(startLabel, gbcSpecs);
         gbcSpecs.gridx = 1;
-        fieldsPanel.add(dateField, gbcSpecs);
+        fieldsPanel.add(startField, gbcSpecs);
 
         gbcSpecs.gridx = 0; 
         gbcSpecs.gridy = 2;
-        fieldsPanel.add(timeLabel, gbcSpecs);
+        fieldsPanel.add(endLabel, gbcSpecs);
         gbcSpecs.gridx = 1;
-        fieldsPanel.add(timeField, gbcSpecs);
+        fieldsPanel.add(endField, gbcSpecs);
 
         gbcSpecs.gridx = 0; 
         gbcSpecs.gridy = 3;
-        fieldsPanel.add(durationLabel, gbcSpecs);
+        fieldsPanel.add(employeeLabel, gbcSpecs);
         gbcSpecs.gridx = 1;
-        fieldsPanel.add(durationField, gbcSpecs);
+        fieldsPanel.add(employeeField, gbcSpecs);
 
         gbcSpecs.gridx = 0; 
         gbcSpecs.gridy = 4;
-        fieldsPanel.add(employeesLabel, gbcSpecs);
+        fieldsPanel.add(residentLabel, gbcSpecs);
         gbcSpecs.gridx = 1;
-        fieldsPanel.add(employeesField, gbcSpecs);
-
-        gbcSpecs.gridx = 0; 
-        gbcSpecs.gridy = 5;
-        fieldsPanel.add(residentsLabel, gbcSpecs);
-        gbcSpecs.gridx = 1;
-        fieldsPanel.add(residentsField, gbcSpecs);
+        fieldsPanel.add(residentField, gbcSpecs);
 
         
         /* combine all panels */
@@ -136,5 +124,29 @@ public class RescueOperation extends JPanel {
 
     public JButton getUpdateButton() {
         return updateButton;
+    }
+
+    public String getDisasterType() {
+        return typeField.getText();
+    }
+
+    public String getStartDateTime() {
+        return startField.getText();
+    }
+
+    public String getEndDateTime() {
+        return endField.getText();
+    }
+
+    public String getEmployeeAssigned() {
+        return employeeField.getText();
+    }
+
+    public String getRescuedResident() {
+        return residentField.getText();
+    }
+
+    public void setActionListener(ActionListener listener) {
+        updateButton.addActionListener(listener);
     }
 }

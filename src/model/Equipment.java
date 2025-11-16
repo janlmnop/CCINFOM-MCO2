@@ -11,9 +11,7 @@ public class Equipment {
     private String availability;
 
     /* CONSTRUCTOR */
-    public Equipment() {
-
-    }
+    public Equipment() {}
 
 
     /* GETTERS & SETTERS */

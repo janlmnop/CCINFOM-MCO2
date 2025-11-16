@@ -1,8 +1,23 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS response_employee;
+DROP TABLE IF EXISTS response_resident;
+DROP TABLE IF EXISTS response;
+DROP TABLE IF EXISTS disaster;
+DROP TABLE IF EXISTS shelter;
+DROP TABLE IF EXISTS employee;
+DROP TABLE IF EXISTS resident;
+DROP TABLE IF EXISTS equipment;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
 CREATE DATABASE  IF NOT EXISTS `dbapp` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `dbapp`;
 
+SET FOREIGN_KEY_CHECKS = 0;
+
+
 -- employee table
-DROP TABLE IF EXISTS employee;
 CREATE TABLE employee (
 	employee_id int(10) NOT NULL,
 	last_name varchar(45) NOT NULL,
@@ -21,7 +36,6 @@ INSERT INTO employee VALUES
 (2, "Rivera", "Francesca", "Carlos", "1990-03-04", "Rescue", "Response Officer", 09987654321, "Y");
     
 -- resident table
-DROP TABLE IF EXISTS resident;
 CREATE TABLE resident (
 	resident_id	int(10) NOT NULL,
 	last_name varchar(45) NOT NULL,
@@ -40,7 +54,6 @@ INSERT INTO resident VALUES
 (2, "Espiritu", "Leah", "Rubio", "F", "2002-11-17", "M", 09937502853, "12 Road 4567 Street");
 
 -- shelter table
-DROP TABLE IF EXISTS shelter;
 CREATE TABLE shelter (
 	shelter_id int(10) NOT NULL,
     shelter_name varchar(45) NOT NULL,
@@ -55,7 +68,6 @@ INSERT INTO shelter VALUES
 (2, "City Hall", "Somewhere st. somewhere road", 10, "Closed");
 
 -- equipment table
-DROP TABLE IF EXISTS equipment;
 CREATE TABLE equipment (
 	equipment_id int(10) NOT NULL,
     equipment_name varchar(45) NOT NULL,
@@ -67,6 +79,40 @@ CREATE TABLE equipment (
 INSERT INTO equipment VALUES
 (1, "ambulance", 2, "Available"),
 (2, "medical kit", 5, "Not Available");
+
+-- response table
+CREATE TABLE response (
+	response_id int(10) NOT NULL,
+    disaster_id int(10) NOT NULL,
+    shelter_id int(10) NOT NULL,
+    employee_id int(10) NOT NULL,
+	response_type enum("RS", "E", "MA", "RL", "RO") NOT NULL,
+    response_start DateTime NOT NULL,
+    response_end DateTime NOT NULL,
+    PRIMARY KEY (response_id),
+    FOREIGN KEY (disaster_id) REFERENCES disaster(disaster_id),
+    FOREIGN KEY (shelter_id) REFERENCES shelter(shelter_id));
+
+-- drop data for response
+INSERT INTO response VALUES
+(1, 1, 1, 1, "RS", "2025-01-01 12:12:12", "2025-01-02 12:12:12"),
+(2, 2, 2, 2, "E", "2025-02-02 07:07:07", "2025-07-03 07:07:07");
+
+-- disaster table
+CREATE TABLE disaster (
+	disaster_id int(10) NOT NULL,
+    disaster_type varchar(45) NOT NULL,
+    date_occurred Date NOT NULL,
+    location varchar(45) NOT NULL,
+	severity enum("L", "M", "H", "S") NOT NULL,
+    casualties int NOT NULL,
+    damages int NOT NULL,
+    PRIMARY KEY (disaster_id));
+
+-- drop data for response
+INSERT INTO disaster VALUES
+(1, "Typhoon", "2025-02-03", "Some St.", "L", 5, 50000),
+(2, "Fire", "2025-09-21", "Another St.", "S", 2, 3000);
 
 
 
