@@ -20,7 +20,10 @@ public class MainFrame extends JFrame {
     /* ATTRIBUTES */
     private CardLayout cardLayout;
     private JPanel mainPanel;
-
+    
+    //test
+    private Controller controller;
+    //test
 
     /* OTHER FRAMES */
     private LoginFrame loginFrame = new LoginFrame();;
@@ -68,6 +71,10 @@ public class MainFrame extends JFrame {
         mainPanel.add(employeeReport, "employee report");
         mainPanel.add(successMessage, "success message");
         mainPanel.add(errorMessage, "error message");
+
+        //test
+        controller = new Controller(this, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment);
+        //test
 
         /* redirections : this might be in controller instead of here */
         /* from transactions menu */
@@ -140,7 +147,6 @@ public class MainFrame extends JFrame {
     private void showAssignToShelterPane() {
         cardLayout.show(mainPanel, "assign to shelter");
 
-        Controller controller = new Controller(this, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment);
         controller.loadEmployeeNames(assignToShelter);
     }
 
@@ -148,7 +154,6 @@ public class MainFrame extends JFrame {
     private void showReleaseFromShelterPane() {
         cardLayout.show(mainPanel, "release from shelter");
 
-        Controller controller = new Controller(this, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment);
         controller.loadEmployeeNames(releaseFromShelter);
     }
 
@@ -156,7 +161,6 @@ public class MainFrame extends JFrame {
     private void showBorrowEquipmentPane() {
         cardLayout.show(mainPanel, "borrow equipment");
 
-        Controller controller = new Controller(this, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment);
         controller.loadEquipmentNames(borrowEquipment);
         controller.loadResidentNames(borrowEquipment);
     }
@@ -166,7 +170,6 @@ public class MainFrame extends JFrame {
     private void showReturnEquipmentPane() {
         cardLayout.show(mainPanel, "return equipment");
 
-        Controller controller = new Controller(this, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment);
         controller.loadEquipmentNames(returnEquipment);
         controller.loadResidentNames(returnEquipment);
     }
