@@ -73,6 +73,18 @@ public class Controller implements ActionListener, DocumentListener {
 
             returnEquipment(item, quantity, borrower, date);
         }
+
+        // assign resident to shelter
+        if (e.getSource() == asShelter.getAssignButton()) {
+            String residentID = asShelter.getResidentID();
+            String shelterID = asShelter.getShelterID();
+            String date = asShelter.getDate();
+            String time = asShelter.getTime();
+            String employeeAssigned = asShelter.getEmployeeAssigned();
+
+            assignToShelter(residentID, shelterID, date, time, employeeAssigned);
+        }
+        
     }
 
     @Override
@@ -188,6 +200,162 @@ public class Controller implements ActionListener, DocumentListener {
             System.out.println(e.getMessage());
             return 0;
         }
+    }
+
+    public int assignToShelter(String residentID, String shelterID, String date, String time, String employeeAssigned) {
+        try {
+            //parse ints
+            int residentIdInt = Integer.parseInt(residentID);
+            int shelterIdInt = Integer.parseInt(shelterID);
+
+            // 1. connect to our database
+            Connection conn;
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "mysqlrootpass");
+
+            // 2.a reading disaster records (chooses most recent disaster)
+            int disasterId = -1;
+            PreparedStatement pstmt = conn.prepareStatement("SELECT disaster_id FROM disaster ORDER BY date_occurred DESC LIMIT 1");
+            ResultSet rst = pstmt.executeQuery();
+        
+            while (rst.next()) {
+                disasterId = rst.getInt("disaster_id");
+            }
+            rst.close();
+            pstmt.close();
+
+            if (disasterId == -1) {
+                System.out.println("No disaster records.");
+                conn.close();
+                return 0;
+            }
+
+            // 2.b reading resident record
+            pstmt = conn.prepareStatement("SELECT resident_id FROM resident WHERE resident_id = ?");
+            pstmt.setInt(1, residentIdInt);
+            rst = pstmt.executeQuery();
+
+            if (!rst.next()) {
+                rst.close();
+                pstmt.close();
+                conn.close();
+                System.out.println("Resident ID not found.");
+                return 0;
+            }
+            rst.close();
+            pstmt.close();
+
+            // 2.c read shelter record to check capacity and status
+            int capacity = 0;
+            String shelterStatus = "";
+
+            pstmt = conn.prepareStatement("SELECT capacity, status FROM shelter WHERE shelter_id = ?");
+            pstmt.setInt(1, shelterIdInt);
+            rst = pstmt.executeQuery();
+
+            if (rst.next()) {
+                capacity = rst.getInt("capacity");
+                shelterStatus = rst.getString("status");
+            }
+            else {
+                rst.close();
+                pstmt.close();
+                conn.close();
+               System.out.println("Shelter ID not found.");
+                return 0;
+            }
+            rst.close();
+            pstmt.close();
+
+            if (!shelterStatus.equals("Open")) {
+                conn.close();
+                System.out.println("Shelter is closed.");
+                return 0;
+            }
+
+            // computing current occupants in shelter
+            int occupants = 0;
+            pstmt = conn.prepareStatement("SELECT COUNT(*) AS occupants FROM response r JOIN response_resident rr ON r.response_id = rr.response_id WHERE r.shelter_id = ? AND rr.role = 'evacuated'");
+            pstmt.setInt(1, shelterIdInt);
+            rst = pstmt.executeQuery();
+            
+            if (rst.next()) {
+                occupants = rst.getInt("occupants");
+            }
+            rst.close();
+            pstmt.close();
+
+            if (occupants >= capacity) {
+                conn.close();
+                System.out.println("Shelter is full.");
+                return 0;
+            }
+
+            // 2.d reading employee records for employee_id
+            int employeeId = -1;
+            pstmt = conn.prepareStatement("SELECT employee_id FROM employee WHERE CONCAT(first_name, ' ', last_name) = ?");
+            pstmt.setString(1, employeeAssigned);
+            rst = pstmt.executeQuery();
+
+            if (rst.next()) {
+                employeeId = rst.getInt("employee_id");
+            }
+            rst.close();
+            pstmt.close();
+
+            if (employeeId == -1) {
+                conn.close();
+                System.out.println("Employee nt found.");
+                return 0;
+            }
+
+            // 3. recording evacuation details in response
+            Response thisResponse = new Response();
+
+            //3.1 get next response ID
+            pstmt = conn.prepareStatement("SELECT IFNULL(MAX(response_id), 0) + 1 AS responseID FROM response");
+            rst = pstmt.executeQuery(); 
+
+            while (rst.next()) {
+                thisResponse.setResponseID(rst.getInt("responseID"));
+            }
+            rst.close();
+            pstmt.close();
+
+            // 3.2 building datetime string from date + time inputs
+            String dateTime = date + " " + time;
+
+            //3.3 inserting information into response (E/evacuation type)
+            pstmt = conn.prepareStatement("INSERT INTO response (response_id, disaster_id, shelter_id, employee_id, response_type, response_start, response_end) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        
+            pstmt.setInt(1, thisResponse.getResponseID());
+            pstmt.setInt(2, disasterId);
+            pstmt.setInt(3, shelterIdInt);
+            pstmt.setInt(4, employeeId);
+            pstmt.setString(5, "E"); //for evacuation
+            pstmt.setString(6, dateTime); //response start
+            pstmt.setString(7, dateTime); //response end
+        
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            //3.4 inserting evaucated resident into response_resident
+            pstmt = conn.prepareStatement("INSERT INTO response_resident (response_id, resident_id, role) VALUES (?, ?, 'evacuated')");
+            pstmt.setInt(1, thisResponse.getResponseID());
+            pstmt.setInt(2, residentIdInt);
+            pstmt.executeUpdate();
+                pstmt.close();
+
+            //4. closing connection
+            conn.close();
+
+            System.out.println("Success!");
+            return 1;
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            return 0;
+        }
+
     }
 
     public int borrowEquipment(String item, String qty, String borrower, String date) {
