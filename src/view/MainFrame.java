@@ -32,6 +32,7 @@ public class MainFrame extends JFrame {
     private ReturnEquipment returnEquipment = new ReturnEquipment();
     private ViewReports viewReports = new ViewReports();
     private ResponseReport responseReport = new ResponseReport();
+    private ShelterReport shelterReport = new ShelterReport();
     private EquipmentReport equipmentReport = new EquipmentReport();
     private EmployeeReport employeeReport = new EmployeeReport();
     private SuccessMessage successMessage = new SuccessMessage();
@@ -62,6 +63,7 @@ public class MainFrame extends JFrame {
         mainPanel.add(returnEquipment, "return equipment");
         mainPanel.add(viewReports, "view reports");
         mainPanel.add(responseReport, "response report");
+        mainPanel.add(shelterReport, "shelter report");
         mainPanel.add(equipmentReport, "equipment report");
         mainPanel.add(employeeReport, "employee report");
         mainPanel.add(successMessage, "success message");
@@ -102,16 +104,19 @@ public class MainFrame extends JFrame {
 
         /* from view reports menu */
         viewReports.getResponseButton().addActionListener(e -> showResponseReportsPane());
+        viewReports.getShelterButton().addActionListener(e -> showShelterReportsPane());
         viewReports.getEquipmentButton().addActionListener(e -> showEquipmentReportsPane());
         viewReports.getEmployeeButton().addActionListener(e -> showEmployeeReportsPane());
 
-        /* for back buttons in reports, equipments, & employees */
+        /* for back buttons (all reports) */
         responseReport.getBackTransButton().addActionListener(e -> showTransactionsMenu());
+        shelterReport.getBackTransButton().addActionListener(e -> showTransactionsMenu());
         equipmentReport.getBackTransButton().addActionListener(e -> showTransactionsMenu());
         employeeReport.getBackTransButton().addActionListener(e -> showTransactionsMenu());
 
         /* reports to transactions menu */
         responseReport.getBackRepsButton().addActionListener(e -> showViewReportsPane());
+        shelterReport.getBackRepsButton().addActionListener(e -> showViewReportsPane());
         equipmentReport.getBackRepsButton().addActionListener(e -> showViewReportsPane());
         employeeReport.getBackRepsButton().addActionListener(e -> showViewReportsPane());
         
@@ -175,7 +180,12 @@ public class MainFrame extends JFrame {
     private void showResponseReportsPane() {
         cardLayout.show(mainPanel, "response report");
     }
-
+    
+    /* leads to shelter occupancy reports pane */
+    private void showShelterReportsPane() {
+        cardLayout.show(mainPanel, "shelter report");
+    }
+    
     /*leads to equipment utilization reports pane */
     private void showEquipmentReportsPane() {
         cardLayout.show(mainPanel, "equipment report");
