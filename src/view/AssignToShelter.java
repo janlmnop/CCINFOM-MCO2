@@ -4,7 +4,7 @@
  *  the current time, and the employee assigned for accounting purposes.
  * 
  *  Notes:
- *  - not connected to a database yet
+ *  - connected to db
 */
 
 package view;
@@ -24,6 +24,16 @@ public class AssignToShelter extends JPanel {
     private JButton backButton = new JButton("Back");
     private JButton assignButton = new JButton("Assign");
 
+    private JLabel residentIDLabel = new JLabel();
+    private JLabel shelterIDLabel = new JLabel();
+    private JLabel dateLabel = new JLabel();
+    private JLabel timeLabel = new JLabel();
+    private JLabel employeeAssignedLabel = new JLabel();
+
+    private JTextField residentIDField;
+    private JTextField shelterIDField;
+    private JTextField dateField;
+    private JTextField timeField;  
     private JComboBox<String> employeeAssignedField;
 
     public AssignToShelter() {
@@ -56,19 +66,19 @@ public class AssignToShelter extends JPanel {
         gbcSpecs.insets = new Insets(10, 10, 10, 10);
         gbcSpecs.anchor = GridBagConstraints.WEST;
 
-        JLabel residentIDLabel = new JLabel("Resident ID:");
-        JTextField residentIDField = new JTextField(20);                               // aternative
+        residentIDLabel = new JLabel("Resident ID:");
+        residentIDField = new JTextField(20);                               // aternative
 
-        JLabel shelterIDLabel = new JLabel("Shelter ID:");
-        JTextField shelterIDField = new JTextField(20);   
+        shelterIDLabel = new JLabel("Shelter ID:");
+        shelterIDField = new JTextField(20);   
         
-        JLabel dateLabel = new JLabel("Date (dd/MM/yyy):");
-        JTextField dateField = new JTextField(20);
+        dateLabel = new JLabel("Date (dd/MM/yyy):");
+        dateField = new JTextField(20);
 
-        JLabel timeLabel = new JLabel("Time (24:59):");
-        JTextField timeField = new JTextField(20);
+        timeLabel = new JLabel("Time (24:59):");
+        timeField = new JTextField(20);
         
-        JLabel employeeAssignedLabel = new JLabel("Employee Assigned:");
+        employeeAssignedLabel = new JLabel("Employee Assigned:");
         employeeAssignedField = new JComboBox<>();                                    // NOTE : change this too; it should come from the db
         employeeAssignedField.setPreferredSize(new Dimension(255, 25));
 
@@ -119,5 +129,28 @@ public class AssignToShelter extends JPanel {
 
     public JComboBox<String> getEmployeeComboBox() {
         return employeeAssignedField;
+    }
+
+    public String getResidentID() {
+        return residentIDField.getText();
+    }
+
+    public String getShelterID() {
+        return shelterIDField.getText();
+    }
+
+    public String getDate() {
+        return dateField.getText();
+    }
+
+    public String getTime() {
+        return timeField.getText();
+    }
+
+    public String getEmployeeAssigned() {
+        if (employeeAssignedField.getSelectedItem() == null) {
+            return "";
+        }
+        return employeeAssignedField.getSelectedItem().toString();
     }
 }
