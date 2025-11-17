@@ -91,7 +91,7 @@ CREATE TABLE response (
     response_end DateTime NOT NULL,
     PRIMARY KEY (response_id),
     FOREIGN KEY (disaster_id) REFERENCES disaster(disaster_id),
-    FOREIGN KEY (shelter_id) REFERENCES shelter(shelter_id)
+    FOREIGN KEY (shelter_id) REFERENCES shelter(shelter_id),
 	FOREIGN KEY (employee_id) REFERENCES employee(employee_id));
 
 -- drop data for response
