@@ -164,6 +164,7 @@ public class Controller implements ActionListener, DocumentListener {
             viewRE.getBorrowerComboBox().addItem(s);
     }
 
+
     /* DB MANIPULATION ON ACTUAL TRANSACTIONS */
     public int rescueOperation(String disasterType, String startDateTime, String endDateTime, String employeeAssigned, String rescuedResident) {
          try {
@@ -377,10 +378,10 @@ public class Controller implements ActionListener, DocumentListener {
             pstmt = conn.prepareStatement("UPDATE equipment SET quantity_per_name=quantity_per_name-? WHERE equipment_name LIKE ?"); 
             pstmt.setInt(1, Integer.parseInt(qty));
             pstmt.setString(2, item);
+            pstmt.executeUpdate();
 
             pstmt = conn.prepareStatement("UPDATE equipment SET availability='Not Available' WHERE equipment_name LIKE ? && quantity_per_name=0"); 
             pstmt.setString(1, item);
-
             pstmt.executeUpdate();
 
             // close assets
@@ -413,13 +414,13 @@ public class Controller implements ActionListener, DocumentListener {
 
             // 2.2 add to quantity + set available if qty is above 0
             pstmt = conn.prepareStatement("UPDATE equipment SET quantity_per_name=quantity_per_name+? WHERE equipment_name LIKE ?");
-            pstmt.setInt(1, thisEquipment.getEquipmentID());
+            //pstmt.setInt(1, thisEquipment.getEquipmentID());
             pstmt.setInt(1, Integer.parseInt(qty));
             pstmt.setString(2, item);
+            pstmt.executeUpdate();
 
             pstmt = conn.prepareStatement("UPDATE equipment SET availability='Available' WHERE equipment_name LIKE ? && quantity_per_name>0"); 
             pstmt.setString(1, item);
-
             pstmt.executeUpdate();      // pag query, may result na bumabalik, pag update wala
 
             // close assets
