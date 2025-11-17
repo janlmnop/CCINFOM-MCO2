@@ -77,8 +77,9 @@ CREATE TABLE equipment (
 
 -- drop data for equipment
 INSERT INTO equipment VALUES
-(1, "ambulance", 2, "Available"),
-(2, "medical kit", 5, "Not Available");
+(1, "Ambulance", 2, "Available"),
+(2, "Medical Kit", 5, "Available"),
+(3, "Life Vest", 0, "Not Available");
 
 -- response table
 CREATE TABLE response (

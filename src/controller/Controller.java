@@ -380,7 +380,7 @@ public class Controller implements ActionListener, DocumentListener {
             pstmt.setString(2, item);
             pstmt.executeUpdate();
 
-            pstmt = conn.prepareStatement("UPDATE equipment SET availability='Not Available' WHERE equipment_name LIKE ? && quantity_per_name=0"); 
+            pstmt = conn.prepareStatement("UPDATE equipment SET availability='Not Available' WHERE equipment_name LIKE ? && quantity_per_name<0"); 
             pstmt.setString(1, item);
             pstmt.executeUpdate();
 

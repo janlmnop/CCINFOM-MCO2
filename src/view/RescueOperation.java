@@ -68,7 +68,7 @@ public class RescueOperation extends JPanel {
         startField.setColumns(20);
 
         endField = new JTextField();
-        endLabel.setText("Start Date & Time (YYYY-MM-DD HH:MI:SS):");
+        endLabel.setText("End Date & Time (YYYY-MM-DD HH:MI:SS):");
         endField.setColumns(20);
         
         employeeField = new JTextField();
