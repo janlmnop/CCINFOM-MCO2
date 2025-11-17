@@ -64,6 +64,6 @@ public class Shelter {
     }
 
 
-    /* METHODS */
+    /* METHODS  Might change this */
 
 }
