@@ -210,7 +210,7 @@ public class Controller implements ActionListener, DocumentListener {
 
             // 1. connect to our database
             Connection conn;
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "mysqlrootpass");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
 
             // 2.a reading disaster records (chooses most recent disaster)
             int disasterId = -1;
