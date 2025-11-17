@@ -16,13 +16,18 @@ public class RescueOperation extends JPanel {
     private JLabel endLabel = new JLabel();
     private JLabel employeeLabel = new JLabel();
     private JLabel residentLabel = new JLabel();
+    private JLabel locationLabel = new JLabel();
+    private JLabel casualtiesLabel = new JLabel();
+    private JLabel damagesLabel = new JLabel();
 
     private JTextField typeField;
     private JTextField startField;
     private JTextField endField;
-    private JTextField employeeField;
-    private JTextField residentField;
-
+    private JComboBox<String> employeeField;
+    private JComboBox<String> residentField;
+    private JTextField locationField;
+    private JTextField casualtiesField;
+    private JTextField damagesField;
 
 
     public RescueOperation() {
@@ -71,13 +76,25 @@ public class RescueOperation extends JPanel {
         endLabel.setText("End Date & Time (YYYY-MM-DD HH:MI:SS):");
         endField.setColumns(20);
         
-        employeeField = new JTextField();
-        employeeLabel.setText("Employee(s) Assigned:");                          
-        employeeField.setColumns(20);
+        employeeLabel.setText("Employee Assigned:");  
+        employeeField = new JComboBox<String>();
+        employeeField.setPreferredSize(new Dimension(255, 25));
 
-        residentField = new JTextField();
-        residentLabel.setText("Rescued Resident(s):");
-        residentField.setColumns(20);
+        residentLabel.setText("Rescued Resident:");
+        residentField = new JComboBox<String>();
+        residentField.setPreferredSize(new Dimension(255, 25));
+
+        locationLabel.setText("Location:");  
+        locationField = new JTextField();
+        locationField.setColumns(20);
+
+        casualtiesLabel.setText("Casualties:");
+        casualtiesField = new JTextField();
+        casualtiesField.setColumns(20);
+
+        damagesLabel.setText("Damages:");
+        damagesField = new JTextField();
+        damagesField.setColumns(20);
 
         gbcSpecs.gridx = 0; 
         gbcSpecs.gridy = 0;
@@ -109,6 +126,24 @@ public class RescueOperation extends JPanel {
         gbcSpecs.gridx = 1;
         fieldsPanel.add(residentField, gbcSpecs);
 
+        gbcSpecs.gridx = 0; 
+        gbcSpecs.gridy = 5;
+        fieldsPanel.add(locationLabel, gbcSpecs);
+        gbcSpecs.gridx = 1;
+        fieldsPanel.add(locationField, gbcSpecs);
+
+        gbcSpecs.gridx = 0; 
+        gbcSpecs.gridy = 6;
+        fieldsPanel.add(casualtiesLabel, gbcSpecs);
+        gbcSpecs.gridx = 1;
+        fieldsPanel.add(casualtiesField, gbcSpecs);
+
+        gbcSpecs.gridx = 0; 
+        gbcSpecs.gridy = 7;
+        fieldsPanel.add(damagesLabel, gbcSpecs);
+        gbcSpecs.gridx = 1;
+        fieldsPanel.add(damagesField, gbcSpecs);
+
         
         /* combine all panels */
         add(fieldsPanel, BorderLayout.CENTER);   
@@ -138,12 +173,32 @@ public class RescueOperation extends JPanel {
         return endField.getText();
     }
 
+    public JComboBox<String> getEmployeeComboBox() {
+        return employeeField;
+    }
+
+    public JComboBox<String> getResidentComboBox() {
+        return residentField;
+    }
+
     public String getEmployeeAssigned() {
-        return employeeField.getText();
+        return employeeField.getSelectedItem().toString();
     }
 
     public String getRescuedResident() {
-        return residentField.getText();
+        return residentField.getSelectedItem().toString();
+    }
+
+    public String getLoc() {
+        return locationField.getText();
+    }
+
+    public int getCasualties() {
+        return Integer.parseInt(casualtiesField.getText());
+    }
+
+    public int getDamages() {
+        return Integer.parseInt(damagesField.getText());
     }
 
     public void setActionListener(ActionListener listener) {

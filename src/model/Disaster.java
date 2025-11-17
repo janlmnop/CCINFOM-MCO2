@@ -13,4 +13,12 @@ public class Disaster {
     private int damages;
 
     public Disaster() {}
+
+    public int getDisasterID() {
+        return disasterID;
+    }
+
+    public void setDisasterID(int disasterID) {
+        this.disasterID = disasterID;
+    }
 }

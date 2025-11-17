@@ -15,7 +15,7 @@ public class Shelter {
     }
 
     /* GETTERS & SETTERS */
-    public int getSheleterID() {
+    public int getShelterID() {
         return shelterID;
     }
 
@@ -39,7 +39,7 @@ public class Shelter {
         return status;
     }
 
-    public void setSheleterID(int shelterID) {
+    public void setShelterID(int shelterID) {
         this.shelterID = shelterID;
     }
 

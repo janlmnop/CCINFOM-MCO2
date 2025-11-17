@@ -16,10 +16,10 @@ import javax.swing.*;
 public class LoginFrame extends JPanel {
     /* UI COMPONENTS */
     private JLabel titleLabel;        
-    private JLabel usernameLabel;     
+    private JLabel idLabel;     
     private JLabel passwordLabel;    
     private JButton loginButton; 
-    public JTextField nameField;          
+    public JTextField idField;          
     public JPasswordField passwordField; 
     
     public static final String LOGIN = "login";
@@ -43,16 +43,16 @@ public class LoginFrame extends JPanel {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
 
-        usernameLabel = new JLabel("Username:");
+        idLabel = new JLabel("Employee ID:");
         passwordLabel = new JLabel("Password:");
-        nameField = new JTextField(15);
+        idField = new JTextField(15);
         passwordField = new JPasswordField(15);
 
         gbc.gridx = 0; 
         gbc.gridy = 0;
-        fieldsPanel.add(usernameLabel, gbc);
+        fieldsPanel.add(idLabel, gbc);
         gbc.gridx = 1;
-        fieldsPanel.add(nameField, gbc);
+        fieldsPanel.add(idField, gbc);
 
         gbc.gridx = 0; 
         gbc.gridy = 1;
@@ -82,8 +82,9 @@ public class LoginFrame extends JPanel {
 
 
     /* GETTERS */
-    public String getUserName() {
-        return nameField.getText();
+    public int getUserID() {
+        int employeeID = Integer.parseInt(idField.getText());
+        return employeeID;
     }
 
     public String getPassword() {
@@ -99,4 +100,6 @@ public class LoginFrame extends JPanel {
     public void setActionListener(ActionListener listener) {
         loginButton.addActionListener(listener);
     }
+
+    
 }

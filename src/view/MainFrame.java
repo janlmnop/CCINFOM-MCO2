@@ -21,9 +21,7 @@ public class MainFrame extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     
-    //test
     private Controller controller;
-    //test
 
     /* OTHER FRAMES */
     private LoginFrame loginFrame = new LoginFrame();;
@@ -73,12 +71,11 @@ public class MainFrame extends JFrame {
         mainPanel.add(errorMessage, "error message");
 
         //test
-        controller = new Controller(this, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment);
+        controller = new Controller(this, loginFrame, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment);
         //test
 
-        /* redirections : this might be in controller instead of here */
+        /* redirections */
         /* from transactions menu */
-        loginFrame.getLoginButton().addActionListener(e -> showTransactionsMenu());
         transactionsMenu.getBtnT1().addActionListener(e -> showRescueOperationPane());
         transactionsMenu.getBtnT2().addActionListener(e -> showAssignToShelterPane());
         transactionsMenu.getBtnT3().addActionListener(e -> showReleaseFromShelterPane());
@@ -86,7 +83,7 @@ public class MainFrame extends JFrame {
         transactionsMenu.getBtnT5().addActionListener(e -> showReturnEquipmentPane());
         transactionsMenu.getBtnReports().addActionListener(e -> showViewReportsPane());
 
-        /* for back buttons in transactions */
+        /* for back buttons (all transsactions -> transaction menu) */
         rescueOperation.getBackButton().addActionListener(e -> showTransactionsMenu());
         assignToShelter.getBackButton().addActionListener(e -> showTransactionsMenu());
         releaseFromShelter.getBackButton().addActionListener(e -> showTransactionsMenu());
@@ -115,13 +112,13 @@ public class MainFrame extends JFrame {
         viewReports.getEquipmentButton().addActionListener(e -> showEquipmentReportsPane());
         viewReports.getEmployeeButton().addActionListener(e -> showEmployeeReportsPane());
 
-        /* for back buttons (all reports) */
+        /* for back buttons (all reports -> transaction menu) */
         responseReport.getBackTransButton().addActionListener(e -> showTransactionsMenu());
         shelterReport.getBackTransButton().addActionListener(e -> showTransactionsMenu());
         equipmentReport.getBackTransButton().addActionListener(e -> showTransactionsMenu());
         employeeReport.getBackTransButton().addActionListener(e -> showTransactionsMenu());
 
-        /* reports to transactions menu */
+        /* for back buttons (all reports -> reports pane) */
         responseReport.getBackRepsButton().addActionListener(e -> showViewReportsPane());
         shelterReport.getBackRepsButton().addActionListener(e -> showViewReportsPane());
         equipmentReport.getBackRepsButton().addActionListener(e -> showViewReportsPane());
@@ -134,13 +131,16 @@ public class MainFrame extends JFrame {
 
 
     /* leads to transactions menu frame */
-    private void showTransactionsMenu() {
+    public void showTransactionsMenu() {
         cardLayout.show(mainPanel, "transactions");
     }
 
     /* leads to assign to shelter pane */
     private void showRescueOperationPane() {
         cardLayout.show(mainPanel, "rescue operation");
+
+        controller.loadEmployeeNames(rescueOperation);
+        controller.loadResidentNames(rescueOperation);
     }
 
     /* leads to assign to shelter pane */

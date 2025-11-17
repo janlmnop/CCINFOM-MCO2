@@ -84,4 +84,24 @@ public class Employee extends Person {
 
         return list;
     }
+
+    public boolean logUserIn(int employeeID, String password) {
+        try {
+            Connection conn;
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
+
+            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM employee WHERE employee_id = ? AND password = ?");
+
+            pstmt.setInt(1, employeeID);
+            pstmt.setString(2, password);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            return rs.next();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -1,14 +1,19 @@
 package controller;
 
 import javax.swing.event.*;
+
+import com.mysql.cj.log.Log;
+
 import java.awt.event.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import view.*;
+import model.Disaster;
 import model.Employee;
 import model.Resident;
 import model.Response;
@@ -17,6 +22,7 @@ import model.Equipment;
 
 public class Controller implements ActionListener, DocumentListener {
     private MainFrame mainFrame;
+    private LoginFrame login;
     private RescueOperation resOp;
     private AssignToShelter asShelter;
     private ReleaseFromShelter reShelter;
@@ -25,14 +31,16 @@ public class Controller implements ActionListener, DocumentListener {
 
     public Controller() {}
 
-    public Controller(MainFrame mainFrame, RescueOperation resOp, AssignToShelter asShelter, ReleaseFromShelter reShelter, BorrowEquipment bEquip, ReturnEquipment rEquip) {
+    public Controller(MainFrame mainFrame, LoginFrame login, RescueOperation resOp, AssignToShelter asShelter, ReleaseFromShelter reShelter, BorrowEquipment bEquip, ReturnEquipment rEquip) {
         this.mainFrame = mainFrame;
+        this.login = login;
         this.resOp = resOp;
         this.asShelter = asShelter;
         this.reShelter = reShelter;
         this.bEquip = bEquip;
         this.rEquip = rEquip;
 
+        login.getLoginButton().addActionListener(this);
         resOp.getUpdateButton().addActionListener(this);
         asShelter.getAssignButton().addActionListener(this);
         reShelter.getReleaseButton().addActionListener(this);
@@ -43,6 +51,14 @@ public class Controller implements ActionListener, DocumentListener {
 
     @Override
     public void actionPerformed (ActionEvent e) {
+        // login screen
+        if (e.getSource() == login.getLoginButton()) {
+            int employeeID = login.getUserID();
+            String password = login.getPassword();
+
+            isValidUser(employeeID, password);
+        }
+
         // rescue operation
         if (e.getSource() == resOp.getUpdateButton()) {
             String disasterType = resOp.getDisasterType();
@@ -50,8 +66,11 @@ public class Controller implements ActionListener, DocumentListener {
             String endDateTime = resOp.getEndDateTime();
             String employeeAssigned = resOp.getEmployeeAssigned();
             String rescuedResident = resOp.getRescuedResident();
+            String location = resOp.getLoc();
+            int casualties = resOp.getCasualties();
+            int damages = resOp.getDamages();
 
-            rescueOperation(disasterType, startDateTime, endDateTime, employeeAssigned, rescuedResident);
+            rescueOperation(disasterType, startDateTime, endDateTime, employeeAssigned, rescuedResident, location, casualties, damages);
         }
 
         // borrow equipment
@@ -120,6 +139,17 @@ public class Controller implements ActionListener, DocumentListener {
             viewRE.getItemComboBox().addItem(s);
     }
 
+    public void loadEmployeeNames(RescueOperation viewRO) {
+        Employee employeeModel = new Employee();
+
+        List<String> names = employeeModel.getEmployeeList();
+
+        viewRO.getEmployeeComboBox().removeAllItems();
+
+        for (String s : names)
+            viewRO.getEmployeeComboBox().addItem(s);
+    }
+
     public void loadEmployeeNames(AssignToShelter viewATS) {
         Employee employeeModel = new Employee();
 
@@ -140,6 +170,17 @@ public class Controller implements ActionListener, DocumentListener {
 
         for (String s : names)
             viewRFS.getEmployeeComboBox().addItem(s);
+    }
+
+    public void loadResidentNames(RescueOperation viewRO) {
+        Resident residentModel = new Resident();
+
+        List<String> names = residentModel.getResidentList();
+
+        viewRO.getResidentComboBox().removeAllItems();
+
+        for (String s : names)
+            viewRO.getResidentComboBox().addItem(s);
     }
 
     public void loadResidentNames(BorrowEquipment viewBE) {
@@ -166,35 +207,124 @@ public class Controller implements ActionListener, DocumentListener {
 
 
     /* DB MANIPULATION ON ACTUAL TRANSACTIONS */
-    public int rescueOperation(String disasterType, String startDateTime, String endDateTime, String employeeAssigned, String rescuedResident) {
-         try {
-            Response thisResponse = new Response();
+    public int isValidUser(int inputId, String inputPassword) {
+        Employee thisEmployee = new Employee();
 
-            // 1. connect to our database
+        if(thisEmployee.logUserIn(inputId, inputPassword)) {
+            System.out.println("Success!");
+            login.getLoginButton().addActionListener(e -> mainFrame.showTransactionsMenu());;
+            return 1;
+        } else {
+            System.out.println("Nope!");
+            return 0;
+        }
+    }
+
+    public int rescueOperation(String disasterType, String startDateTime, String endDateTime, String employeeAssigned, String rescuedResident, String location, int casualties, int damages) {
+        try {
+            Disaster thisDisaster = new Disaster();
+            Response thisResponse = new Response();
+            Shelter thisShelter = new Shelter();
+            Employee thisEmployee = new Employee();
+
+            // 1. connect to database
             Connection conn;
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
 
-            // 2.1 to get the next response ID
-            PreparedStatement pstmt = conn.prepareStatement("SELECT MAX(response_id) + 1 AS responseID FROM response");
-            ResultSet rst = pstmt.executeQuery();   // result set gets the value after excuting the query
-            while (rst.next()) {
-                thisResponse.setResponseID(rst.getInt("responseID"));
+            // 2.1 Create disaster record first
+            PreparedStatement pstmt;
+            ResultSet rst;
+            int disasterId;
+            pstmt = conn.prepareStatement("SELECT MAX(disaster_id) + 1 AS disasterID FROM disaster");
+            rst = pstmt.executeQuery();
+            while(rst.next()) {
+                disasterId = rst.getInt("disasterID");
+                thisDisaster.setDisasterID(disasterId);
             }
+            pstmt.close();
 
-            // 2.2 log response details
-            pstmt = conn.prepareStatement("INSERT INTO response (response_id, response_type, response_start, response_end) VALUES (?, ?, ?, ?)");
-            pstmt.setInt(1, thisResponse.getResponseID());
-            pstmt.setString(2, "RS");   // always rescue
+            // insert disaster record
+            pstmt = conn.prepareStatement("INSERT INTO disaster (disaster_id, disaster_type, date_occurred, location, casualties, damages) VALUES (?, ?, DATE(?), ?, ?, ?)");
+            pstmt.setInt(1, thisDisaster.getDisasterID());
+            pstmt.setString(2, disasterType);
             pstmt.setString(3, startDateTime);
-            pstmt.setString(4, endDateTime);
-
+            pstmt.setString(4, location);
+            pstmt.setInt(5, casualties);
+            pstmt.setInt(6, damages);
             pstmt.executeUpdate();
+            pstmt.close();
 
-            // close assets
+            // 2.2 get the next response ID
+            int responseId;
+            pstmt = conn.prepareStatement("SELECT MAX(response_id) + 1 AS responseID FROM response");
+            rst = pstmt.executeQuery();
+            while (rst.next()) {
+                responseId = rst.getInt("responseID");
+                thisResponse.setResponseID(responseId);
+            }
+            pstmt.close();
+
+            // 2.3 get employee ID from name
+            int employeeId;
+            pstmt = conn.prepareStatement("SELECT employee_id FROM employee WHERE CONCAT(first_name, ' ', last_name) = ?");
+            pstmt.setString(1, employeeAssigned);
+            rst = pstmt.executeQuery();
+            while (rst.next()) {
+                employeeId = rst.getInt("employee_id");
+                thisEmployee.setEmployeeID(employeeId);
+            }
+            pstmt.close();
+
+            // 2.3.5 check available shelters
+            int shelterId;
+            pstmt = conn.prepareStatement("SELECT shelter_id FROM shelter");
+            rst = pstmt.executeQuery();
+            
+            if (rst.next()) {
+                shelterId = rst.getInt("shelter_id");
+                thisShelter.setShelterID(shelterId);
+            } else {
+                throw new SQLException("No shelters available in the database. Please add a shelter first.");
+            }
+            pstmt.close();
+
+            // 2.4 insert response record with all required foreign keys
+            pstmt = conn.prepareStatement("INSERT INTO response (response_id, disaster_id, shelter_id, employee_id, response_type, response_start, response_end) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            pstmt.setInt(1, thisResponse.getResponseID());
+            pstmt.setInt(2, thisDisaster.getDisasterID());
+            pstmt.setInt(3, thisShelter.getShelterID());
+            pstmt.setInt(4, thisEmployee.getEmployeeID());
+            pstmt.setString(5, "RS"); 
+            pstmt.setString(6, startDateTime);
+            pstmt.setString(7, endDateTime);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // 2.5 handles the rescued resident
+            // int residentId;
+            // pstmt = conn.prepareStatement("SELECT resident_id FROM resident WHERE CONCAT(first_name, ' ', last_name) = ?");
+            // pstmt.setString(1, rescuedResident);
+            // rst = pstmt.executeQuery();
+            
+            // if (rst.next()) {
+            //     residentId = rst.getInt("resident_id");
+            //     pstmt.close();
+                
+            //     // insert into response_resident table
+            //     pstmt = conn.prepareStatement("INSERT INTO response_resident (response_id, resident_id, role) VALUES (?, ?, ?)");
+            //     pstmt.setInt(1, thisResponse.getResponseID());
+            //     pstmt.setInt(2, residentId);
+            //     pstmt.setString(3, "Affected");
+            //     pstmt.executeUpdate();
+            //     pstmt.close();
+            // } else {
+            //     throw new SQLException("Resident not found: " + rescuedResident);
+            // }
+            System.out.println("Success!");
+
+            rst.close();
             pstmt.close();
             conn.close();
-
-            System.out.println("Success!");
             return 1;
 
         } catch (Exception e) {
@@ -356,7 +486,6 @@ public class Controller implements ActionListener, DocumentListener {
             System.out.println(e.getMessage());
             return 0;
         }
-
     }
 
     public int borrowEquipment(String item, String qty, String borrower, String date) {
