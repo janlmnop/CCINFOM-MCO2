@@ -64,6 +64,31 @@ public class Shelter {
     }
 
 
-    /* METHODS */
+    /* METHODS  Might change this */
+    public void addOccupant(Person person) {
+    if (isFull()) {
+        System.out.println("Shelter is full");
+        return;
+    }
+    
+    for (int i = 0; i < occupants.length; i++) {
+        if (occupants[i] == null) {
+            occupants[i] = person;
+            break;
+        }
+    }
+    }
+
+    public int getCurrentOccupancy() {
+    int count = 0;
+    for (Person p : occupants) {
+        if (p != null) count++;
+    }
+    return count;
+    }
+
+    public boolean isFull() {
+        return getCurrentOccupancy() >= capacity;
+    }
 
 }
