@@ -75,4 +75,33 @@ public class Equipment {
 
         return list;
     }
+
+    // this is to show the equipment table contents
+    public Object[][] getEquipmentData() {
+        List<Object[]> dataList = new ArrayList<>();
+        
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
+            PreparedStatement pstmt = conn.prepareStatement("SELECT equipment_name, quantity_per_name, availability FROM equipment ORDER BY equipment_name");
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Object[] row = {rs.getString("equipment_name"), rs.getInt("quantity_per_name"), rs.getString("availability")};
+                dataList.add(row);
+            }
+
+            rs.close();
+            pstmt.close();
+            conn.close();
+        } catch (Exception e) {
+            
+        }
+
+        // converts the list to 2D array
+        Object[][] data = new Object[dataList.size()][];
+        for (int i=0; i<dataList.size(); i++)
+            data[i] = dataList.get(i);
+        
+        return data;
+    }
 }

@@ -1,8 +1,5 @@
 /**
  *  This contains the Transactions Menu, where users can select from five options.
- * 
- *  Note:
- *  - don't forget to change transactions if changed in docs.
 */
 
 package view;

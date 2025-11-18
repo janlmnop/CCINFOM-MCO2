@@ -1,24 +1,12 @@
 package controller;
 
 import javax.swing.event.*;
-
-import com.mysql.cj.log.Log;
-
 import java.awt.event.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
+import java.sql.*;
+import java.util.*;
 
 import view.*;
-import model.Disaster;
-import model.Employee;
-import model.Resident;
-import model.Response;
-import model.Shelter;
-import model.Equipment;
+import model.*;
 
 public class Controller implements ActionListener, DocumentListener {
     private MainFrame mainFrame;
@@ -28,10 +16,11 @@ public class Controller implements ActionListener, DocumentListener {
     private ReleaseFromShelter reShelter;
     private BorrowEquipment bEquip;
     private ReturnEquipment rEquip;
+    private ResponseReport rRep;
 
     public Controller() {}
 
-    public Controller(MainFrame mainFrame, LoginFrame login, RescueOperation resOp, AssignToShelter asShelter, ReleaseFromShelter reShelter, BorrowEquipment bEquip, ReturnEquipment rEquip) {
+    public Controller(MainFrame mainFrame, LoginFrame login, RescueOperation resOp, AssignToShelter asShelter, ReleaseFromShelter reShelter, BorrowEquipment bEquip, ReturnEquipment rEquip, ResponseReport rRep) {
         this.mainFrame = mainFrame;
         this.login = login;
         this.resOp = resOp;
@@ -39,15 +28,21 @@ public class Controller implements ActionListener, DocumentListener {
         this.reShelter = reShelter;
         this.bEquip = bEquip;
         this.rEquip = rEquip;
+        this.rRep = rRep;
 
+        // add transaction action listeners
         login.getLoginButton().addActionListener(this);
         resOp.getUpdateButton().addActionListener(this);
         asShelter.getAssignButton().addActionListener(this);
         reShelter.getReleaseButton().addActionListener(this);
         bEquip.getBorrowButton().addActionListener(this);
         rEquip.getReturnButton().addActionListener(this);
-    }
 
+        // load initial data for response report
+        loadReportFilterOptions();
+        refreshReportTable();
+
+    }
 
     @Override
     public void actionPerformed (ActionEvent e) {
@@ -55,7 +50,6 @@ public class Controller implements ActionListener, DocumentListener {
         if (e.getSource() == login.getLoginButton()) {
             int employeeID = login.getUserID();
             String password = login.getPassword();
-
             isValidUser(employeeID, password);
         }
 
@@ -104,6 +98,10 @@ public class Controller implements ActionListener, DocumentListener {
             assignToShelter(residentID, shelterID, date, time, employeeAssigned);
         }
         
+        // refresh response report table contents
+        if (e.getSource() == rRep.getFilterButton()) {
+            refreshReportTable();
+        }
     }
 
     @Override
@@ -114,105 +112,98 @@ public class Controller implements ActionListener, DocumentListener {
 
     @Override
     public void changedUpdate (DocumentEvent e) {}
-
+    
+    
 
     /* SHOWS DROPDOWN VALUES FROM DB */
     public void loadEquipmentNames(BorrowEquipment viewBE) {
         Equipment equipmentModel = new Equipment();
-
         List<String> items = equipmentModel.getEquipmentList();
-
         viewBE.getItemComboBox().removeAllItems();
-
         for (String s : items)
             viewBE.getItemComboBox().addItem(s);
     }
 
     public void loadEquipmentNames(ReturnEquipment viewRE) {
         Equipment equipmentModel = new Equipment();
-
         List<String> items = equipmentModel.getEquipmentList();
-
         viewRE.getItemComboBox().removeAllItems();
-
         for (String s : items)
             viewRE.getItemComboBox().addItem(s);
     }
 
     public void loadEmployeeNames(RescueOperation viewRO) {
         Employee employeeModel = new Employee();
-
         List<String> names = employeeModel.getEmployeeList();
-
         viewRO.getEmployeeComboBox().removeAllItems();
-
         for (String s : names)
             viewRO.getEmployeeComboBox().addItem(s);
     }
 
     public void loadEmployeeNames(AssignToShelter viewATS) {
         Employee employeeModel = new Employee();
-
         List<String> names = employeeModel.getEmployeeList();
-
         viewATS.getEmployeeComboBox().removeAllItems();
-
         for (String s : names)
             viewATS.getEmployeeComboBox().addItem(s);
     }
 
     public void loadEmployeeNames(ReleaseFromShelter viewRFS) {
         Employee employeeModel = new Employee();
-
         List<String> names = employeeModel.getEmployeeList();
-
         viewRFS.getEmployeeComboBox().removeAllItems();
-
         for (String s : names)
             viewRFS.getEmployeeComboBox().addItem(s);
     }
 
     public void loadResidentNames(RescueOperation viewRO) {
         Resident residentModel = new Resident();
-
         List<String> names = residentModel.getResidentList();
-
         viewRO.getResidentComboBox().removeAllItems();
-
         for (String s : names)
             viewRO.getResidentComboBox().addItem(s);
     }
 
     public void loadResidentNames(BorrowEquipment viewBE) {
         Resident residentModel = new Resident();
-
         List<String> names = residentModel.getResidentList();
-
         viewBE.getBorrowerComboBox().removeAllItems();
-
         for (String s : names)
             viewBE.getBorrowerComboBox().addItem(s);
     }
 
     public void loadResidentNames(ReturnEquipment viewRE) {
         Resident residentModel = new Resident();
-
         List<String> names = residentModel.getResidentList();
-
         viewRE.getBorrowerComboBox().removeAllItems();
-
         for (String s : names)
             viewRE.getBorrowerComboBox().addItem(s);
     }
+
+    public void loadReportFilterOptions() {
+        Response thisResponse = new Response();
+
+        // load years dropdown
+        List<Integer> years = thisResponse.getAvailableYears();
+        String[] yearStrings = new String[years.size()];
+        for (int i = 0; i < years.size(); i++) {
+            yearStrings[i] = String.valueOf(years.get(i));
+        }
+        rRep.setYearOptions(yearStrings);
+        
+        // load disaster types dropdown
+        List<String> disasters = thisResponse.getDisasterTypes();
+        rRep.setDisasterOptions(disasters.toArray(new String[0]));
+    }
+
 
 
     /* DB MANIPULATION ON ACTUAL TRANSACTIONS */
     public int isValidUser(int inputId, String inputPassword) {
         Employee thisEmployee = new Employee();
-
         if(thisEmployee.logUserIn(inputId, inputPassword)) {
             System.out.println("Success!");
-            login.getLoginButton().addActionListener(e -> mainFrame.showTransactionsMenu());;
+            login.getLoginButton().addActionListener(e -> mainFrame.showTransactionsMenu());
             return 1;
         } else {
             System.out.println("Nope!");
@@ -300,35 +291,14 @@ public class Controller implements ActionListener, DocumentListener {
             pstmt.executeUpdate();
             pstmt.close();
 
-            // 2.5 handles the rescued resident
-            // int residentId;
-            // pstmt = conn.prepareStatement("SELECT resident_id FROM resident WHERE CONCAT(first_name, ' ', last_name) = ?");
-            // pstmt.setString(1, rescuedResident);
-            // rst = pstmt.executeQuery();
-            
-            // if (rst.next()) {
-            //     residentId = rst.getInt("resident_id");
-            //     pstmt.close();
-                
-            //     // insert into response_resident table
-            //     pstmt = conn.prepareStatement("INSERT INTO response_resident (response_id, resident_id, role) VALUES (?, ?, ?)");
-            //     pstmt.setInt(1, thisResponse.getResponseID());
-            //     pstmt.setInt(2, residentId);
-            //     pstmt.setString(3, "Affected");
-            //     pstmt.executeUpdate();
-            //     pstmt.close();
-            // } else {
-            //     throw new SQLException("Resident not found: " + rescuedResident);
-            // }
             System.out.println("Success!");
-
             rst.close();
             pstmt.close();
             conn.close();
             return 1;
 
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
             return 0;
         }
     }
@@ -435,7 +405,7 @@ public class Controller implements ActionListener, DocumentListener {
 
             if (employeeId == -1) {
                 conn.close();
-                System.out.println("Employee nt found.");
+                System.out.println("Employee not found.");
                 return 0;
             }
 
@@ -474,7 +444,7 @@ public class Controller implements ActionListener, DocumentListener {
             pstmt.setInt(1, thisResponse.getResponseID());
             pstmt.setInt(2, residentIdInt);
             pstmt.executeUpdate();
-                pstmt.close();
+            pstmt.close();
 
             //4. closing connection
             conn.close();
@@ -482,8 +452,8 @@ public class Controller implements ActionListener, DocumentListener {
             System.out.println("Success!");
             return 1;
         }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
+        catch (Exception ex) {
+            System.out.println(ex.getMessage());
             return 0;
         }
     }
@@ -520,8 +490,8 @@ public class Controller implements ActionListener, DocumentListener {
             System.out.println("Success!");
             return 1;
 
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
             return 0;
         }
     }
@@ -543,14 +513,13 @@ public class Controller implements ActionListener, DocumentListener {
 
             // 2.2 add to quantity + set available if qty is above 0
             pstmt = conn.prepareStatement("UPDATE equipment SET quantity_per_name=quantity_per_name+? WHERE equipment_name LIKE ?");
-            //pstmt.setInt(1, thisEquipment.getEquipmentID());
             pstmt.setInt(1, Integer.parseInt(qty));
             pstmt.setString(2, item);
             pstmt.executeUpdate();
 
             pstmt = conn.prepareStatement("UPDATE equipment SET availability='Available' WHERE equipment_name LIKE ? && quantity_per_name>0"); 
             pstmt.setString(1, item);
-            pstmt.executeUpdate();      // pag query, may result na bumabalik, pag update wala
+            pstmt.executeUpdate();
 
             // close assets
             pstmt.close();
@@ -559,9 +528,28 @@ public class Controller implements ActionListener, DocumentListener {
             System.out.println("Success!");
             return 1;
 
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
             return 0;
         }
     }
-} 
+
+
+
+    /* updates response report */
+    public void refreshReportTable() {
+        Response thisResponse = new Response();
+
+        int year = rRep.getSelectedYear();
+        int month = rRep.getSelectedMonth();
+        
+        List<String[]> reportData = thisResponse.getRescueReportByMonth(year, month);
+        
+        // convert to 2D array for table
+        String[][] dataArray = reportData.toArray(new String[0][]);
+        String[] columnNames = {"Disaster ID", "Disaster Type", "Date Occurred", "Location", "Residents Rescued"};
+        rRep.setTableData(dataArray, columnNames);
+
+        System.out.println("Average: " + thisResponse.getAverageRescuedPerDisaster(year, month));
+    }
+}

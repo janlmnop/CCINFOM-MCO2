@@ -1,9 +1,6 @@
 /**
  *  This contains the Response Report panel, where users can view the total and average
  *  residents rescued and evacuated per disaster cases for a given year and month.
- * 
- *  Notes:
- *  - not connected to a database yet
 */
 
 package view;
@@ -16,16 +13,14 @@ public class ResponseReport extends JPanel {
     private String[] months = {"January", "February", "March", "April",
                                 "May", "June", "July", "August",
                                 "September", "October", "November", "December"};
-    // NOTE: replace these
-    private String[] colNames = {"Response", "Disaster", "No. Rescued", "No. Evacuated", "Total"};
-    private String[][] data = {{"001", "Typhoon", "12", "34", "56"},
-                            {"002", "Fire", "65", "43", "21"},
-                            {"003", "Earthquake", "98", "76", "54"}};
+    private String[] colNames = {"Disaster ID", "Disaster Type", "Date Occurred", "Location", "Residents Rescued"};
+    private String[][] data;
 
     /* UI components */
     private JLabel titleLabel = new JLabel();
     private JButton backTransButton = new JButton();
     private JButton backRepsButton = new JButton();
+    private JButton filterButton = new JButton();
 
     private JLabel filterByLabel = new JLabel();
     private JLabel monthLabel = new JLabel();
@@ -37,7 +32,7 @@ public class ResponseReport extends JPanel {
     private JComboBox<String> disasterField = new JComboBox<String>();
 
     private JTable responseReportTable = new JTable();
-
+    private JPanel tablePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
 
 
@@ -86,6 +81,9 @@ public class ResponseReport extends JPanel {
         disasterLabel.setText("Disaster:");
         disasterField.setPreferredSize(new Dimension(150, 25));
 
+        filterButton.setText("Apply Filter");
+        filterButton.setPreferredSize(new Dimension(120, 25));
+
         gbcSpecs.gridx = 0; 
         gbcSpecs.gridy = 0;
         filterByPanel.add(filterByLabel, gbcSpecs);
@@ -109,20 +107,28 @@ public class ResponseReport extends JPanel {
         gbcSpecs.gridx = 5;
         filterByPanel.add(disasterField, gbcSpecs);
 
+        gbcSpecs.gridx = 6;
+        gbcSpecs.gridy = 1;
+        filterByPanel.add(filterButton, gbcSpecs);
+
         /* stats panel -- will see if I'll add this pa */
+        JPanel statsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        statsPanel.setBorder(BorderFactory.createTitledBorder("Summary Statistics"));
 
         /* table panel */
-        JPanel tablePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         responseReportTable = new JTable(data, colNames);
         JScrollPane scrollPane = new JScrollPane(responseReportTable);
-        scrollPane.setPreferredSize(new Dimension(400,350));
+        scrollPane.setPreferredSize(new Dimension(600, 100));
         tablePanel.add(scrollPane);
 
         /* combine center panels */
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.add(filterByPanel);
-        centerPanel.add(scrollPane);
+        // centerPanel.add(statsPanel);
+        centerPanel.add(tablePanel);
+
+
 
         /* combine all panels */
         add(titlePanel, BorderLayout.NORTH);
@@ -135,8 +141,73 @@ public class ResponseReport extends JPanel {
         return backTransButton;
     }
 
-    /* gets the borrow button */
+    /* gets the back to reports button */
     public JButton getBackRepsButton() {
         return backRepsButton;
+    }
+
+    /* gets the filter button */
+    public JButton getFilterButton() {
+        return filterButton;
+    }
+
+    /* fills table data */
+    public void setTableData(String[][] data, String[] columnNames) {
+        this.data = data;
+        this.colNames = columnNames;
+        responseReportTable = new JTable(data, columnNames);
+        
+        // refresh the table in the UI based on filters
+        JScrollPane scrollPane = new JScrollPane(responseReportTable);
+        scrollPane.setPreferredSize(new Dimension(600, 350));
+        
+        // removes old table and adds the new one
+        tablePanel.removeAll();
+        tablePanel.add(scrollPane);
+        tablePanel.revalidate();
+        tablePanel.repaint();
+    }
+    
+    /* gets the month in the dropdown*/
+    public int getSelectedMonth() {
+        return monthField.getSelectedIndex() + 1;
+    }
+    
+    /* gets the year in the dropdown */
+    public int getSelectedYear() {
+        String selectedYear = yearField.getSelectedItem().toString();
+        
+        try {
+            return Integer.parseInt(selectedYear);
+        } catch (NumberFormatException e) {
+            return 2025;
+        }
+    }
+    
+    /* get selected disaster type */
+    public String getSelectedDisasterType() {
+        return disasterField.getSelectedItem().toString();
+    }
+    
+    /* populate year combobox */
+    public void setYearOptions(String[] years) {
+        yearField.removeAllItems();
+        for (String year : years)
+            yearField.addItem(year);
+
+        // set default selection to current year if available
+        if (years.length > 0)
+            yearField.setSelectedItem(years[0]);
+    }
+    
+    /* populate disaster type combobox */
+    public void setDisasterOptions(String[] disasters) {
+        disasterField.removeAllItems();
+        for (String disaster : disasters)
+            disasterField.addItem(disaster);
+
+        // set default selection to first item
+        if (disasters.length > 0)
+            disasterField.setSelectedItem(disasters[0]);
     }
 }

@@ -1,24 +1,27 @@
 /**
  *  This contains the Return Equipment panel, where users can the equipment they've used
  *  by specifying its name, the quanitity, the borrower's name, and the current date.
- * 
- *  Notes:
- *  - should update db when Borrow button is pressed
- *  - extra: should return success message
 */
 
 package view;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 
+import model.Equipment;
+
 
 public class ReturnEquipment extends JPanel {
+    /* attributes */
+    Equipment equipment = new Equipment();
+
     /* UI COMPONENTS */
     private JLabel titleLabel = new JLabel();
     private JButton backButton = new JButton();
     private JButton returnButton = new JButton();
+    private JTable equipmentTable;
 
     JLabel itemLabel = new JLabel();
     JLabel qtyLabel = new JLabel();
@@ -58,6 +61,21 @@ public class ReturnEquipment extends JPanel {
         gbcButtons.gridx = 1;
         buttonPanel.add(returnButton, gbcButtons);
         gbcButtons.gridx = 2;
+
+        /* table panel */
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        String[] columnNames = {"Equipment Name", "Quantity", "Availability"};
+        
+        equipmentTable = new JTable(equipment.getEquipmentData(), columnNames);
+        equipmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        equipmentTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+        equipmentTable.getColumnModel().getColumn(1).setPreferredWidth(50); 
+        equipmentTable.getColumnModel().getColumn(2).setPreferredWidth(50);
+        
+        JScrollPane scrollPane = new JScrollPane(equipmentTable);
+        scrollPane.setPreferredSize(new Dimension(500, 200));
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
 
         /* equipment specifications panel */
         JPanel equipmentSpecsPanel = new JPanel(new GridBagLayout());
@@ -106,7 +124,11 @@ public class ReturnEquipment extends JPanel {
 
 
         /* combine all panels */
-        add(equipmentSpecsPanel, BorderLayout.CENTER);   
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.add(tablePanel);
+        centerPanel.add(equipmentSpecsPanel);  
+        add(centerPanel, BorderLayout.CENTER);
         add(titlePanel, BorderLayout.NORTH);
         add(buttonPanel, BorderLayout.SOUTH);
     }

@@ -71,7 +71,7 @@ public class MainFrame extends JFrame {
         mainPanel.add(errorMessage, "error message");
 
         //test
-        controller = new Controller(this, loginFrame, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment);
+        controller = new Controller(this, loginFrame, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment, responseReport);
         //test
 
         /* redirections */

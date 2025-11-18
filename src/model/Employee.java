@@ -1,8 +1,7 @@
 package model;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Employee extends Person {
     /* ATTRIBUTES */
@@ -14,9 +13,7 @@ public class Employee extends Person {
 
 
     /* CONSTRUCTOR(S) */    
-    public Employee() {
-    
-    }
+    public Employee() {}
 
 
     /* GETTERS & SETTERS */

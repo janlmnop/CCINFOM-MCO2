@@ -12,6 +12,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import model.Equipment;
+
 
 public class BorrowEquipment extends JPanel {            
     /* UI COMPONENTS */
@@ -27,6 +29,9 @@ public class BorrowEquipment extends JPanel {
 
 
     public BorrowEquipment() {
+        /* attributes */
+        Equipment equipment = new Equipment();
+
         /* panel settings */
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
@@ -55,11 +60,19 @@ public class BorrowEquipment extends JPanel {
         gbcButtons.gridx = 2;
 
         /* table panel */
-        // JPanel tablePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        // equipmentTable = new JTable(sample, colNames);
-        // JScrollPane scrollPane = new JScrollPane(equipmentTable);
-        // scrollPane.setPreferredSize(new Dimension(600,250));
-        // tablePanel.add(scrollPane);
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        String[] columnNames = {"Equipment Name", "Quantity", "Availability"};
+        
+        equipmentTable = new JTable(equipment.getEquipmentData(), columnNames);
+        equipmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        equipmentTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+        equipmentTable.getColumnModel().getColumn(1).setPreferredWidth(50); 
+        equipmentTable.getColumnModel().getColumn(2).setPreferredWidth(50);
+        
+        JScrollPane scrollPane = new JScrollPane(equipmentTable);
+        scrollPane.setPreferredSize(new Dimension(500, 200));
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
 
         /* equipment specifications panel */
         JPanel equipmentSpecsPanel = new JPanel(new GridBagLayout());
@@ -110,7 +123,7 @@ public class BorrowEquipment extends JPanel {
         /* combine all panels */
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        //centerPanel.add(tablePanel);
+        centerPanel.add(tablePanel);
         centerPanel.add(equipmentSpecsPanel);
         add(centerPanel, BorderLayout.CENTER);   
         add(titlePanel, BorderLayout.NORTH);

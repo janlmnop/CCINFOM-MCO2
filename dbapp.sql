@@ -112,7 +112,7 @@ CREATE TABLE response (
 -- drop data into response table
 INSERT INTO response VALUES
 (1, 1, 1, 1, "RS", "2025-01-01 12:12:12", "2025-01-02 12:12:12"),
-(2, 2, 2, 2, "E", "2025-02-02 07:07:07", "2025-07-03 07:07:07");
+(2, 2, 2, 2, "E", "2024-02-02 07:07:07", "2025-07-03 07:07:07");
 
 
 -- ----------------------------------------
@@ -158,7 +158,7 @@ CREATE TABLE disaster (
 -- drop data into disaster table
 INSERT INTO disaster VALUES
 (1, "Typhoon", "2025-02-03", "Some St.", "L", 5, 50000),
-(2, "Fire", "2025-09-21", "Another St.", "S", 2, 3000);
+(2, "Fire", "2024-09-21", "Another St.", "S", 2, 3000);
 
 
 

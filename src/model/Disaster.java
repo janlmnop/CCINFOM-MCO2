@@ -21,4 +21,28 @@ public class Disaster {
     public void setDisasterID(int disasterID) {
         this.disasterID = disasterID;
     }
+
+    public String getDisasterType() {
+        return disasterType;
+    }
+
+    public Date getDateOccurred() {
+        return dateOccurred;
+    }
+
+    public String getLoc() {
+        return location;
+    }
+
+    public String getSeverity() {
+        return severity;
+    }
+
+    public int getCasualties() {
+        return casualties;
+    }
+
+    public int getDamages() {
+        return damages;
+    }
 }

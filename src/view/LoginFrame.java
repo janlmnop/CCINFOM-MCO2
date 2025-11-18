@@ -1,9 +1,5 @@
 /**
  *  This contains the Login Panel. Only valid users (employees), are able to log in.
- * 
- *  Note:
- *  - set conditions for input formatting
- *  - check input with database. deny entry if user is not an employee.
 */
 
 package view;
