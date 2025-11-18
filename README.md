@@ -19,8 +19,8 @@ Follows MVC structure, where:
 
 
 ## To Do
-- [ ] work on your transactions (should connect to the db)
-- [ ] work on your reports (should connect to the db)
+- [ ] work on your transactions (should connect to the db) $ done with 3rd
+- [ ] work on your reports (should connect to the db) $ testing Shelter Report
 - [ ] input validation
 - [ ] put tables when and where needed
 - [ ] update proposal paper if you've made changes
@@ -47,3 +47,4 @@ Follows MVC structure, where:
   - https://drive.google.com/file/d/1BuI93fJYXsNNm50uqeoPv6Oef86wi4LL/view?usp=sharing
   - https://github.com/Pierre120/Java_Meets_SQL.git
   
+
