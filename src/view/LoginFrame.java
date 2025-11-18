@@ -95,7 +95,5 @@ public class LoginFrame extends JPanel {
     /* LISTENER */
     public void setActionListener(ActionListener listener) {
         loginButton.addActionListener(listener);
-    }
-
-    
+    }    
 }

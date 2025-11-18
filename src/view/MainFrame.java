@@ -37,7 +37,8 @@ public class MainFrame extends JFrame {
     private EquipmentReport equipmentReport = new EquipmentReport();
     private EmployeeReport employeeReport = new EmployeeReport();
     private SuccessMessage successMessage = new SuccessMessage();
-    private ErrorMessage errorMessage = new ErrorMessage();
+    private LoginErrorMessage loginErrorMessage = new LoginErrorMessage();
+    private TranErrorMessage tranErrorMessage = new TranErrorMessage();
 
 
 
@@ -68,10 +69,11 @@ public class MainFrame extends JFrame {
         mainPanel.add(equipmentReport, "equipment report");
         mainPanel.add(employeeReport, "employee report");
         mainPanel.add(successMessage, "success message");
-        mainPanel.add(errorMessage, "error message");
+        mainPanel.add(loginErrorMessage, "login error message");
+        mainPanel.add(tranErrorMessage, "transaction error message");
 
         //test
-        controller = new Controller(this, loginFrame, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment, responseReport);
+        controller = new Controller(this, loginFrame, rescueOperation, assignToShelter, releaseFromShelter, borrowEquipment, returnEquipment, responseReport, loginErrorMessage, tranErrorMessage);
         //test
 
         /* redirections */
@@ -129,6 +131,9 @@ public class MainFrame extends JFrame {
         setVisible(true);
     }
 
+    public void showLoginPane() {
+        cardLayout.show(mainPanel, "login");
+    }
 
     /* leads to transactions menu frame */
     public void showTransactionsMenu() {
@@ -136,7 +141,7 @@ public class MainFrame extends JFrame {
     }
 
     /* leads to assign to shelter pane */
-    private void showRescueOperationPane() {
+    public void showRescueOperationPane() {
         cardLayout.show(mainPanel, "rescue operation");
 
         controller.loadEmployeeNames(rescueOperation);
@@ -144,21 +149,21 @@ public class MainFrame extends JFrame {
     }
 
     /* leads to assign to shelter pane */
-    private void showAssignToShelterPane() {
+    public void showAssignToShelterPane() {
         cardLayout.show(mainPanel, "assign to shelter");
 
         controller.loadEmployeeNames(assignToShelter);
     }
 
     /* leads to release from shelter pane */
-    private void showReleaseFromShelterPane() {
+    public void showReleaseFromShelterPane() {
         cardLayout.show(mainPanel, "release from shelter");
 
         controller.loadEmployeeNames(releaseFromShelter);
     }
 
     /* leads to borrow equipment pane */
-    private void showBorrowEquipmentPane() {
+    public void showBorrowEquipmentPane() {
         cardLayout.show(mainPanel, "borrow equipment");
 
         controller.loadEquipmentNames(borrowEquipment);
@@ -167,7 +172,7 @@ public class MainFrame extends JFrame {
 
 
     /* leads to return equipment pane */
-    private void showReturnEquipmentPane() {
+    public void showReturnEquipmentPane() {
         cardLayout.show(mainPanel, "return equipment");
 
         controller.loadEquipmentNames(returnEquipment);
@@ -175,37 +180,44 @@ public class MainFrame extends JFrame {
     }
 
     /* leads to view reports pane */
-    private void showViewReportsPane() {
+    public void showViewReportsPane() {
         cardLayout.show(mainPanel, "view reports");
     }
 
     /* leads to response reports pane */
-    private void showResponseReportsPane() {
+    public void showResponseReportsPane() {
         cardLayout.show(mainPanel, "response report");
     }
     
     /* leads to shelter occupancy reports pane */
-    private void showShelterReportsPane() {
+    public void showShelterReportsPane() {
         cardLayout.show(mainPanel, "shelter report");
     }
     
     /*leads to equipment utilization reports pane */
-    private void showEquipmentReportsPane() {
+    public void showEquipmentReportsPane() {
         cardLayout.show(mainPanel, "equipment report");
     }
 
     /* leads to employee deployment reports page */
-    private void showEmployeeReportsPane() {
+    public void showEmployeeReportsPane() {
         cardLayout.show(mainPanel, "employee report");
     }
     
     /* leads to success message pane */
-    private void showSuccessMessagePane() {
+    public void showSuccessMessagePane() {
         cardLayout.show(mainPanel, "success message");
     }
 
-    /* leads to success message pane */
-    private void showErrorMessagePane() {
-        cardLayout.show(mainPanel, "error message");
+    /* leads to login error message pane */
+    public void showLoginErrorMessagePane(String message) {
+        loginErrorMessage.setErrorMessage(message);
+        cardLayout.show(mainPanel, "login error message");
+    }
+
+    /* leads to Transactions error message pane */
+    public void showTranErrorMessagePane(String message) {
+        tranErrorMessage.setErrorMessage(message);
+        cardLayout.show(mainPanel, "transaction error message");
     }
 }

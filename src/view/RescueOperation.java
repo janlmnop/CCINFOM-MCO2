@@ -20,14 +20,14 @@ public class RescueOperation extends JPanel {
     private JLabel casualtiesLabel = new JLabel();
     private JLabel damagesLabel = new JLabel();
 
-    private JTextField typeField;
-    private JTextField startField;
-    private JTextField endField;
-    private JComboBox<String> employeeField;
-    private JComboBox<String> residentField;
-    private JTextField locationField;
-    private JTextField casualtiesField;
-    private JTextField damagesField;
+    public JTextField typeField;
+    public JTextField startField;
+    public JTextField endField;
+    public JComboBox<String> employeeField;
+    public JComboBox<String> residentField;
+    public JTextField locationField;
+    public JTextField casualtiesField;
+    public JTextField damagesField;
 
 
     public RescueOperation() {

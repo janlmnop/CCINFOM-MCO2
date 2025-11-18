@@ -17,10 +17,16 @@ public class Controller implements ActionListener, DocumentListener {
     private BorrowEquipment bEquip;
     private ReturnEquipment rEquip;
     private ResponseReport rRep;
+    private LoginErrorMessage logEM;
+    private TranErrorMessage tranEM;
+
+    private String previousScreen;
 
     public Controller() {}
 
-    public Controller(MainFrame mainFrame, LoginFrame login, RescueOperation resOp, AssignToShelter asShelter, ReleaseFromShelter reShelter, BorrowEquipment bEquip, ReturnEquipment rEquip, ResponseReport rRep) {
+    public Controller(MainFrame mainFrame, LoginFrame login, RescueOperation resOp, AssignToShelter asShelter,
+                     ReleaseFromShelter reShelter, BorrowEquipment bEquip, ReturnEquipment rEquip, ResponseReport rRep,
+                     LoginErrorMessage logEM, TranErrorMessage tranEM) {
         this.mainFrame = mainFrame;
         this.login = login;
         this.resOp = resOp;
@@ -29,6 +35,8 @@ public class Controller implements ActionListener, DocumentListener {
         this.bEquip = bEquip;
         this.rEquip = rEquip;
         this.rRep = rRep;
+        this.logEM = logEM;
+        this.tranEM = tranEM;
 
         // add transaction action listeners
         login.getLoginButton().addActionListener(this);
@@ -37,6 +45,14 @@ public class Controller implements ActionListener, DocumentListener {
         reShelter.getReleaseButton().addActionListener(this);
         bEquip.getBorrowButton().addActionListener(this);
         rEquip.getReturnButton().addActionListener(this);
+
+        // back button action listeners
+        logEM.getLoginExitButton().addActionListener(this);
+        tranEM.getOtherBackButtons().addActionListener(this);
+
+        // retry button action listeners
+        logEM.getLoginRetryButton().addActionListener(this);
+        tranEM.getOtherRetryButtons().addActionListener(this);
 
         // load initial data for response report
         loadReportFilterOptions();
@@ -102,6 +118,35 @@ public class Controller implements ActionListener, DocumentListener {
         if (e.getSource() == rRep.getFilterButton()) {
             refreshReportTable();
         }
+
+        /* ERROR BACK BUTTONS */
+        if (e.getSource() == logEM.getLoginExitButton()) {
+            System.exit(0);
+        }
+        if (e.getSource() == tranEM.getOtherBackButtons()) {
+            mainFrame.showTransactionsMenu();
+        } 
+
+        /* ERROR RETRY BUTTONS */
+        if (e.getSource() == logEM.getLoginRetryButton()) {
+            mainFrame.showLoginPane();
+        }
+        if (e.getSource() == tranEM.getOtherRetryButtons()) {
+            if ("rescueOperation".equals(previousScreen)) {
+                mainFrame.showRescueOperationPane();
+            } else if ("assignToShelter".equals(previousScreen)) {
+                mainFrame.showAssignToShelterPane();
+            } else if ("releaseFromShelter".equals(previousScreen)) {
+                mainFrame.showReleaseFromShelterPane();
+            } else if ("borrowEquipment".equals(previousScreen)) {
+                mainFrame.showBorrowEquipmentPane();
+            } else if ("returnEquipment".equals(previousScreen)) {
+                mainFrame.showReturnEquipmentPane();
+            } else {
+                mainFrame.showTransactionsMenu(); 
+            }
+        }
+
     }
 
     @Override
@@ -202,11 +247,12 @@ public class Controller implements ActionListener, DocumentListener {
     public int isValidUser(int inputId, String inputPassword) {
         Employee thisEmployee = new Employee();
         if(thisEmployee.logUserIn(inputId, inputPassword)) {
-            System.out.println("Success!");
             login.getLoginButton().addActionListener(e -> mainFrame.showTransactionsMenu());
             return 1;
         } else {
-            System.out.println("Nope!");
+            mainFrame.showLoginErrorMessagePane("Invalid Employee ID or Password. Please try again.");
+            login.passwordField.setText("");
+            login.idField.setText("");
             return 0;
         }
     }
@@ -298,7 +344,15 @@ public class Controller implements ActionListener, DocumentListener {
             return 1;
 
         } catch (Exception ex) {
+            previousScreen = "rescueOperation";
             System.out.println(ex.getMessage());
+            mainFrame.showTranErrorMessagePane(ex.getMessage() + ". Try Again.");
+            resOp.typeField.setText("");
+            resOp.startField.setText("");
+            resOp.endField.setText("");
+            resOp.locationField.setText("");
+            resOp.casualtiesField.setText("");
+            resOp.damagesField.setText("");
             return 0;
         }
     }
@@ -491,7 +545,11 @@ public class Controller implements ActionListener, DocumentListener {
             return 1;
 
         } catch (Exception ex) {
+            previousScreen = "borrowEquipment";
             System.out.println(ex.getMessage());
+            mainFrame.showTranErrorMessagePane(ex.getMessage() + ". Try Again.");
+            bEquip.qtyField.setText("");
+            bEquip.dateField.setText("");
             return 0;
         }
     }
@@ -529,7 +587,11 @@ public class Controller implements ActionListener, DocumentListener {
             return 1;
 
         } catch (Exception ex) {
+            previousScreen = "returnEquipment";
             System.out.println(ex.getMessage());
+            mainFrame.showTranErrorMessagePane(ex.getMessage() + ". Try Again.");
+            rEquip.qtyField.setText("");
+            rEquip.dateField.setText("");
             return 0;
         }
     }

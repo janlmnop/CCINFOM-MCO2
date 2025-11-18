@@ -29,9 +29,9 @@ public class ReturnEquipment extends JPanel {
     JLabel dateLabel = new JLabel();
 
     JComboBox<String> itemField;  
-    JTextField qtyField = new JTextField();                       // NOTE : add input validation
+    public JTextField qtyField;                     
     JComboBox<String> borrowerField;
-    JTextField dateField = new JTextField();
+    public JTextField dateField;
 
 
     public ReturnEquipment() {
@@ -88,6 +88,7 @@ public class ReturnEquipment extends JPanel {
         itemField.setPreferredSize(new Dimension(255, 25));
 
         qtyLabel.setText("Quantity:");
+        qtyField = new JTextField();
         qtyField.setColumns(20);                                        // NOTE : add input validation
 
         borrowerLabel.setText("Borrower:");
@@ -95,6 +96,7 @@ public class ReturnEquipment extends JPanel {
         borrowerField.setPreferredSize(new Dimension(255, 25));
 
         dateLabel.setText("Date (yyyy-MM-dd):");
+        dateField = new JTextField();
         dateField.setColumns(20);
 
         gbcSpecs.gridx = 0; 

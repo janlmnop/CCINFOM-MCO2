@@ -1,9 +1,6 @@
 /**
  *  This contains the Borrow Equipment panel, where users can borrow available equipment by
  *  specifying its name, the quanitity, the borrower's name, and the current date.
- * 
- *  Notes:
- *  - not connected to a database yet
 */
 
 package view;
@@ -22,10 +19,10 @@ public class BorrowEquipment extends JPanel {
     private JButton backButton = new JButton();
     private JButton borrowButton = new JButton();
 
-    private JComboBox<String> itemField;
-    private JComboBox<String> borrowerField;
-    private JTextField qtyField;
-    private JTextField dateField;
+    public JComboBox<String> itemField;
+    public JComboBox<String> borrowerField;
+    public JTextField qtyField;
+    public JTextField dateField;
 
 
     public BorrowEquipment() {
@@ -91,7 +88,7 @@ public class BorrowEquipment extends JPanel {
         borrowerField = new JComboBox<String>();                        
         borrowerField.setPreferredSize(new Dimension(255, 25));
 
-        JLabel dateLabel = new JLabel("Date (dd/MM/yyy):");
+        JLabel dateLabel = new JLabel("Date (YYYY-MM-DD):");
         dateField = new JTextField(20);
 
         gbcSpecs.gridx = 0; 

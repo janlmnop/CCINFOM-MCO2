@@ -1,34 +1,31 @@
 /**
- *  This is contains the error message that pops up when a transaction is unsuccessful.
+ *  This is contains the error message that pops up when login is unsuccessful.
  */
 
 package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;;
 
-public class ErrorMessage extends JPanel {
+public class LoginErrorMessage extends JPanel {
     /* UI components */
-    private JLabel errorMessage = new JLabel();
-    private JLabel message = new JLabel();
-    private JButton backButton = new JButton();
-    private JButton retryButton = new JButton();
+    private JLabel errorMessage;
+    private JButton exitButton = new JButton("Exit");
+    private JButton retryButton = new JButton("Retry");
 
-    public ErrorMessage() {
+    public LoginErrorMessage() {
         /* panel settings */
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
         
         /* message panel */
         JPanel messagePanel = new JPanel();
-        messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
-        errorMessage.setText("Transaction Failed!");
+        messagePanel.setLayout(new GridBagLayout());
+        errorMessage = new JLabel();
         errorMessage.setFont(new Font("Arial", Font.BOLD, 24));
         errorMessage.setForeground(Color.BLACK);
-        message.setText("Check if fields entered are accurate and in the right format.");
-        message.setForeground(Color.BLACK);
         messagePanel.add(errorMessage);
-        messagePanel.add(message);
 
         /* buttons panel */
         JPanel buttonPanel = new JPanel(new GridBagLayout());
@@ -38,10 +35,10 @@ public class ErrorMessage extends JPanel {
         gbcButtons.gridy = 0;
         gbcButtons.anchor = GridBagConstraints.CENTER;
 
-        backButton = new JButton("Back to Transactions");
-        retryButton = new JButton("Retry Transaction");
+        exitButton = new JButton("Exit");
+        retryButton = new JButton("Retry");
 
-        buttonPanel.add(backButton, gbcButtons);
+        buttonPanel.add(exitButton, gbcButtons);
         gbcButtons.gridx = 1;
         buttonPanel.add(retryButton, gbcButtons);
         gbcButtons.gridx = 2;
@@ -51,11 +48,20 @@ public class ErrorMessage extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    public JButton getBackButton() {
-        return backButton; 
+    public JButton getLoginExitButton() {
+        return exitButton; 
     }
 
-    public JButton getRetryButton() {
+    public JButton getLoginRetryButton() {
         return retryButton; 
+    }
+
+    public void setErrorMessage(String message) {
+        errorMessage.setText(message);
+    }
+
+    public void setActionListener(ActionListener listener) {
+        exitButton.addActionListener(listener);
+        retryButton.addActionListener(listener);
     }
 }
