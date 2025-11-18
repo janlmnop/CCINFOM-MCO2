@@ -34,8 +34,9 @@ CREATE TABLE employee (
 
 -- drop data into employee table
 INSERT INTO employee VALUES
-(1, "Dela Cruz", "Juan", "Jimenez", "2000-01-02", "Administrative", "Administrative Staff", 09123456789, "N", "1234567890"),
-(2, "Rivera", "Francesca", "Carlos", "1990-03-04", "Rescue", "Response Officer", 09987654321, "Y", "password");
+(1, "Dela Cruz", "Juan", "Jimenez", "1994-10-02", "Administrative", "Administrative Staff", 09231057294, "N", "password"),
+(2, "Rivera", "Francesca", "Carlos", "1990-03-24", "Rescue", "Medic", 09255825835, "Y", "1234567890"),
+(3, "Bautista", "Nathan", "Castro", "1995-08-13", "Evacuation", "Response Officer", 09914829533, "Y", "HelloWorld");
 
 
 -- ----------------------------------------
@@ -55,8 +56,9 @@ CREATE TABLE resident (
     
 -- drop data into resident table
 INSERT INTO resident VALUES
-(1, "Arroyo", "Kyle", "Cordero", "M", "2003-03-21", "SI", 09143728492, "27 Road 1234 Street"),
-(2, "Espiritu", "Leah", "Rubio", "F", "2002-11-17", "M", 09937502853, "12 Road 4567 Street");
+(1, "Arroyo", "Kyle", "Cordero", "M", "1997-03-21", "M", 09143728492, "429 Habonero Street"),
+(2, "Arroyo", "Leah", "Rubio", "F", "1998-11-17", "M", 09937502853, "429 Habonero Street"),
+(3, "Tamayo", "Julia", "Galang", "F", "1993-02-01", "SI", 09232119433, "One Corporate Plaza 1200");
 
 
 -- ----------------------------------------
@@ -72,8 +74,9 @@ CREATE TABLE shelter (
     
 -- drop data into shelter table
 INSERT INTO shelter VALUES
-(1, "Basketball Court", "Somewhere st. somewhere road", 20, "Open"),
-(2, "City Hall", "Somewhere st. somewhere road", 10, "Closed");
+(1, "Basketball Court", "492 Banawe Street", 20, "Open"),
+(2, "City Hall", "10 Lacson Street", 10, "Closed"),
+(3, "Evacuation Center", "8 Rizal Street", 30, "Open");
 
 
 -- ----------------------------------------
@@ -111,8 +114,8 @@ CREATE TABLE response (
 
 -- drop data into response table
 INSERT INTO response VALUES
-(1, 1, 1, 1, "RS", "2025-01-01 12:12:12", "2025-01-02 12:12:12"),
-(2, 2, 2, 2, "E", "2024-02-02 07:07:07", "2025-07-03 07:07:07");
+(1, 1, 1, 1, "RS", "2025-08-21 13:02:21", "2025-08-21 15:11:04"),
+(2, 2, 2, 2, "E", "2024-02-14 07:27:30", "2024-02-12 08:01:25");
 
 
 -- ----------------------------------------
@@ -157,8 +160,8 @@ CREATE TABLE disaster (
 
 -- drop data into disaster table
 INSERT INTO disaster VALUES
-(1, "Typhoon", "2025-02-03", "Some St.", "L", 5, 50000),
-(2, "Fire", "2024-09-21", "Another St.", "S", 2, 3000);
+(1, "Typhoon", "2025-02-03", "One Corporate Plaza 1200", "L", 5, 50000),
+(2, "Fire", "2024-09-21", "123 Timothy Street", "S", 0, 7500);
 
 
 
