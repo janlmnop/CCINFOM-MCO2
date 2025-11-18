@@ -113,6 +113,17 @@ public class Controller implements ActionListener, DocumentListener {
 
             assignToShelter(residentID, shelterID, date, time, employeeAssigned);
         }
+
+        // release resident from shelter
+        if (e.getSource() == reShelter.getReleaseButton()) {
+            String residentID = reShelter.getResidentID();
+            String shelterID = reShelter.getShelterID();
+            String date = reShelter.getDate();
+            String time = reShelter.getTime();
+            String employeeAssigned = reShelter.getEmployeeAssigned();
+
+            releaseFromShelter(residentID, shelterID, date, time, employeeAssigned);
+        }
         
         // refresh response report table contents
         if (e.getSource() == rRep.getFilterButton()) {
@@ -594,6 +605,144 @@ public class Controller implements ActionListener, DocumentListener {
             rEquip.dateField.setText("");
             return 0;
         }
+    }
+
+
+    public int releaseFromShelter(String residentID, String shelterID, String date, String time, String employeeAssigned) {
+        try {
+            int residentIdInt = Integer.parseInt(residentID);
+            int shelterIdInt = Integer.parseInt(shelterID);
+
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
+
+            // 1. get most recent disaster id
+            int disasterId = -1;
+            PreparedStatement pstmt = conn.prepareStatement("SELECT disaster_id FROM disaster ORDER BY date_occurred DESC LIMIT 1");
+            ResultSet rst = pstmt.executeQuery();
+            while (rst.next()) {
+                disasterId = rst.getInt("disaster_id");
+            }
+            rst.close();
+            pstmt.close();
+
+            if (disasterId == -1) {
+                conn.close();
+                System.out.println("No disaster records.");
+                return 0;
+            }
+
+            // 2. check resident exists
+            pstmt = conn.prepareStatement("SELECT resident_id FROM resident WHERE resident_id = ?");
+            pstmt.setInt(1, residentIdInt);
+            rst = pstmt.executeQuery();
+            if (!rst.next()) {
+                rst.close();
+                pstmt.close();
+                conn.close();
+                System.out.println("Resident ID not found.");
+                return 0;
+            }
+            rst.close();
+            pstmt.close();
+
+            // 3. check shelter exists
+            pstmt = conn.prepareStatement("SELECT capacity, status FROM shelter WHERE shelter_id = ?");
+            pstmt.setInt(1, shelterIdInt);
+            rst = pstmt.executeQuery();
+            if (!rst.next()) {
+                rst.close();
+                pstmt.close();
+                conn.close();
+                System.out.println("Shelter ID not found.");
+                return 0;
+            }
+            rst.close();
+            pstmt.close();
+
+            // 4. get employee id
+            int employeeId = -1;
+            pstmt = conn.prepareStatement("SELECT employee_id FROM employee WHERE CONCAT(first_name, ' ', last_name) = ?");
+            pstmt.setString(1, employeeAssigned);
+            rst = pstmt.executeQuery();
+            if (rst.next()) {
+                employeeId = rst.getInt("employee_id");
+            }
+            rst.close();
+            pstmt.close();
+
+            if (employeeId == -1) {
+                conn.close();
+                System.out.println("Employee not found.");
+                return 0;
+            }
+
+            // 5. insert a response record to log the release
+            Response thisResponse = new Response();
+            pstmt = conn.prepareStatement("SELECT IFNULL(MAX(response_id), 0) + 1 AS responseID FROM response");
+            rst = pstmt.executeQuery();
+            while (rst.next()) {
+                thisResponse.setResponseID(rst.getInt("responseID"));
+            }
+            rst.close();
+            pstmt.close();
+
+            String dateTime = date + " " + time;
+            pstmt = conn.prepareStatement("INSERT INTO response (response_id, disaster_id, shelter_id, employee_id, response_type, response_start, response_end) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            pstmt.setInt(1, thisResponse.getResponseID());
+            pstmt.setInt(2, disasterId);
+            pstmt.setInt(3, shelterIdInt);
+            pstmt.setInt(4, employeeId);
+            pstmt.setString(5, "RL");
+            pstmt.setString(6, dateTime);
+            pstmt.setString(7, dateTime);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // 6. remove evacuated resident entry (free occupant)
+            pstmt = conn.prepareStatement("DELETE rr FROM response_resident rr JOIN response r ON rr.response_id = r.response_id WHERE rr.resident_id = ? AND r.shelter_id = ? AND rr.role = 'evacuated'");
+            pstmt.setInt(1, residentIdInt);
+            pstmt.setInt(2, shelterIdInt);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            conn.close();
+            System.out.println("Success!");
+            return 1;
+        } catch (Exception ex) {
+            previousScreen = "releaseFromShelter";
+            System.out.println(ex.getMessage());
+            mainFrame.showTranErrorMessagePane(ex.getMessage() + ". Try Again.");
+            reShelter.getEmployeeComboBox().removeAllItems();
+            return 0;
+        }
+    }
+
+    /* Shelter report wiring */
+    public void loadShelterReportOptions(view.ShelterReport viewSR) {
+        Response thisResponse = new Response();
+        // load years
+        List<Integer> years = thisResponse.getAvailableYears();
+        String[] yearStrings = new String[years.size()];
+        for (int i = 0; i < years.size(); i++) {
+            yearStrings[i] = String.valueOf(years.get(i));
+        }
+        viewSR.setYearOptions(yearStrings);
+
+        // load shelter options
+        List<String> shelters = thisResponse.getShelterList();
+        viewSR.setShelterOptions(shelters.toArray(new String[0]));
+    }
+
+    public void refreshShelterReport(view.ShelterReport viewSR) {
+        Response thisResponse = new Response();
+        int year = viewSR.getSelectedYear();
+        int month = viewSR.getSelectedMonth();
+        int shelterId = viewSR.getSelectedShelterID();
+
+        List<String[]> reportData = thisResponse.getShelterOccupancyReport(year, month, shelterId);
+        String[][] dataArray = reportData.toArray(new String[0][]);
+        String[] columnNames = {"Shelter ID", "Shelter", "Capacity", "Total Residents Sheltered (Month)", "Average Daily Occupancy"};
+        viewSR.setTableData(dataArray, columnNames);
     }
 
 

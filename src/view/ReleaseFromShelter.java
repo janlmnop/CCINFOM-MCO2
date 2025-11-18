@@ -24,6 +24,10 @@ public class ReleaseFromShelter extends JPanel {
     private JButton backButton = new JButton("Back");
     private JButton releaseButton = new JButton("Release");
 
+    private JTextField residentIDField;
+    private JTextField shelterIDField;
+    private JTextField dateField;
+    private JTextField timeField;
     private JComboBox<String> employeeAssignedField;
 
     /* constructor */
@@ -58,16 +62,16 @@ public class ReleaseFromShelter extends JPanel {
         gbcSpecs.anchor = GridBagConstraints.WEST;
 
         JLabel residentIDLabel = new JLabel("Resident ID:");
-        JTextField residentIDField = new JTextField(20);                               // aternative
+        residentIDField = new JTextField(20);                               // alternative
 
         JLabel shelterIDLabel = new JLabel("Shelter ID:");
-        JTextField shelterIDField = new JTextField(20);   
+        shelterIDField = new JTextField(20);   
         
         JLabel dateLabel = new JLabel("Date (dd/MM/yyy):");
-        JTextField dateField = new JTextField(20);
+        dateField = new JTextField(20);
 
         JLabel timeLabel = new JLabel("Time (24:59):");
-        JTextField timeField = new JTextField(20);
+        timeField = new JTextField(20);
         
         JLabel employeeAssignedLabel = new JLabel("Employee Assigned:");
         employeeAssignedField = new JComboBox<>();                                    // NOTE : change this too; it should come from the db
@@ -120,5 +124,28 @@ public class ReleaseFromShelter extends JPanel {
 
     public JComboBox<String> getEmployeeComboBox() {
         return employeeAssignedField;
+    }
+
+    public String getResidentID() {
+        return residentIDField.getText();
+    }
+
+    public String getShelterID() {
+        return shelterIDField.getText();
+    }
+
+    public String getDate() {
+        return dateField.getText();
+    }
+
+    public String getTime() {
+        return timeField.getText();
+    }
+
+    public String getEmployeeAssigned() {
+        if (employeeAssignedField.getSelectedItem() == null) {
+            return "";
+        }
+        return employeeAssignedField.getSelectedItem().toString();
     }
 }

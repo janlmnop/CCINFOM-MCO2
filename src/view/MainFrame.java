@@ -192,6 +192,9 @@ public class MainFrame extends JFrame {
     /* leads to shelter occupancy reports pane */
     public void showShelterReportsPane() {
         cardLayout.show(mainPanel, "shelter report");
+        controller.loadShelterReportOptions(shelterReport);
+        controller.refreshShelterReport(shelterReport);
+        shelterReport.getFilterButton().addActionListener(e -> controller.refreshShelterReport(shelterReport));
     }
     
     /*leads to equipment utilization reports pane */
