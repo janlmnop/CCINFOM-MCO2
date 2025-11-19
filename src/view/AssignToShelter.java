@@ -72,10 +72,10 @@ public class AssignToShelter extends JPanel {
         shelterIDLabel = new JLabel("Shelter ID:");
         shelterIDField = new JTextField(20);   
         
-        dateLabel = new JLabel("Date (dd/MM/yyy):");
+        dateLabel = new JLabel("Date (YYYY-MM-DD):");
         dateField = new JTextField(20);
 
-        timeLabel = new JLabel("Time (24:59):");
+        timeLabel = new JLabel("Time (HH:MM:SS):");
         timeField = new JTextField(20);
         
         employeeAssignedLabel = new JLabel("Employee Assigned:");

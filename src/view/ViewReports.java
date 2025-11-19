@@ -16,7 +16,7 @@ public class ViewReports extends JPanel {
     private JButton backButton = new JButton();
     private JButton responseButton = new JButton(RR);
     private JButton shelterButton = new JButton(SB);
-    private JButton equipmentButton = new JButton("Equipment Utilitzation Report");
+    private JButton equipmentButton = new JButton("Equipment Utilization Report");
     private JButton employeeButton = new JButton("Employee Deployment Report");
     
 

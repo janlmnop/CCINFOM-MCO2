@@ -404,7 +404,8 @@ public class Controller implements ActionListener, DocumentListener {
                 rst.close();
                 pstmt.close();
                 conn.close();
-                System.out.println("Resident ID not found.");
+                previousScreen = "assignToShelter";
+                mainFrame.showTranErrorMessagePane("Resident ID not found");
                 return 0;
             }
             rst.close();
@@ -426,7 +427,7 @@ public class Controller implements ActionListener, DocumentListener {
                 rst.close();
                 pstmt.close();
                 conn.close();
-               System.out.println("Shelter ID not found.");
+                System.out.println("Shelter ID not found.");
                 return 0;
             }
             rst.close();
@@ -434,13 +435,30 @@ public class Controller implements ActionListener, DocumentListener {
 
             if (!shelterStatus.equals("Open")) {
                 conn.close();
-                System.out.println("Shelter is closed.");
+                previousScreen = "assignToShelter";
+                mainFrame.showTranErrorMessagePane("Shelter is closed.");
                 return 0;
             }
 
+            // ensuring resident has not evacuated already
+            pstmt = conn.prepareStatement("SELECT 1 FROM response_resident rr WHERE rr.resident_id = ? AND rr.role = 'evacuated' LIMIT 1");
+            pstmt.setInt(1, residentIdInt);
+            rst = pstmt.executeQuery();
+
+            if (rst.next()) {
+                rst.close();
+                pstmt.close();
+                conn.close();
+                System.out.println("Resident is already assigned.");
+                return 0;
+            }
+
+            rst.close();
+            pstmt.close();
+
             // computing current occupants in shelter
             int occupants = 0;
-            pstmt = conn.prepareStatement("SELECT COUNT(*) AS occupants FROM response r JOIN response_resident rr ON r.response_id = rr.response_id WHERE r.shelter_id = ? AND rr.role = 'evacuated'");
+            pstmt = conn.prepareStatement("SELECT COUNT(DISTINCT rr.resident_id) AS occupants FROM response r JOIN response_resident rr ON r.response_id = rr.response_id WHERE r.shelter_id = ? AND rr.role = 'evacuated'");
             pstmt.setInt(1, shelterIdInt);
             rst = pstmt.executeQuery();
             
@@ -745,7 +763,37 @@ public class Controller implements ActionListener, DocumentListener {
         viewSR.setTableData(dataArray, columnNames);
     }
 
+    /* equipment report wiring */
+    public void loadEquipmentReportOptions(view.EquipmentReport viewER) {
+        Response thisResponse = new Response();
 
+        //years
+        List<Integer> years = thisResponse.getAvailableYearsForEquipment();
+        String[] yearStrings = new String[years.size()];
+
+        for (int i = 0; i < years.size(); i++) {
+            yearStrings[i] = String.valueOf(years.get(i));
+        }
+        viewER.setYearOptions(yearStrings);
+
+        //equipment list
+        List<String> eq = thisResponse.getEquipmentList();
+        viewER.setEquipmentOptions(eq.toArray(new String[0]));
+    }
+
+    public void refreshEquipmentReport(view.EquipmentReport viewER) {
+        Response thisResponse = new Response();
+
+        int year = viewER.getSelectedYear();
+        int month = viewER.getSelectedMonth();
+        int equipmentId = viewER.getSelectedEquipmentID();
+
+        List<String[]> rows = thisResponse.getEquipmentUtilizationReport(year, month, equipmentId);
+
+        String[] cols = {"Equipment", "Total Uses", "Total Qty Lent", "Avg Qty/Use", "Stock", "Availability"};
+        String[][] data = rows.toArray(new String[0][]);
+        viewER.setTableData(data, cols);
+    }
 
     /* updates response report */
     public void refreshReportTable() {

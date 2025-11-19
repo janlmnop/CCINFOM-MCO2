@@ -3,7 +3,7 @@
  *  equipment utilization per year and month. 
  * 
  *  Notes:
- *  - not connected to a database yet
+ *  - connected to a database 
 */
 
 package view;
@@ -16,17 +16,12 @@ public class EquipmentReport extends JPanel {
     private String[] months = {"January", "February", "March", "April",
                                 "May", "June", "July", "August",
                                 "September", "October", "November", "December"};
-    
-    //values
-    private String[] colNames = {"Equipment", "Total Uses", "Total Employees", "Total Residents", "Average Uses"};
-    private String[][] data = {{"Portalets", "7", "5", "30", "4.5"},   
-                               {"Tens", "10", "6", "50", "7.3"},
-                               {"Ambulances", "5", "8", "35", "2.3"}};
 
     /* UI components */
     private JLabel titleLabel = new JLabel();
     private JButton backTransButton = new JButton();
     private JButton backRepsButton = new JButton();
+    private JButton filterButton = new JButton();
 
     private JLabel filterByLabel = new JLabel();
     private JLabel monthLabel = new JLabel();
@@ -38,7 +33,7 @@ public class EquipmentReport extends JPanel {
     private JComboBox<String> equipmentField = new JComboBox<String>();
 
     private JTable equipmentReportTable = new JTable();
-
+    private JPanel tablePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
     public EquipmentReport() {
         /* panel settings */
@@ -85,10 +80,8 @@ public class EquipmentReport extends JPanel {
         equipmentLabel.setText("Equipment:");
         equipmentField.setPreferredSize(new Dimension(150, 25));
 
-        gbcSpecs.gridx = 0; 
-        gbcSpecs.gridy = 0;
-        filterByPanel.add(filterByLabel, gbcSpecs);
-        gbcSpecs.gridx = 1;
+        filterButton.setText("Apply Filter");
+        filterButton.setPreferredSize(new Dimension(120, 25));
 
         gbcSpecs.gridx = 0; 
         gbcSpecs.gridy = 1;
@@ -108,21 +101,25 @@ public class EquipmentReport extends JPanel {
         gbcSpecs.gridx = 5;
         filterByPanel.add(equipmentField, gbcSpecs);
 
+        gbcSpecs.gridx = 6;
+        gbcSpecs.gridy = 1;
+        filterByPanel.add(filterButton, gbcSpecs);
 
         /* stats panel (unsure) */
 
         /* table panel */
-        JPanel tablePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        equipmentReportTable = new JTable(data, colNames);
+        String[] colNames = {"Equipment", "Total Uses", "Total Qty Lent", "Avg Qty/Use",  "Stock", "Availability"};
+
+        equipmentReportTable = new JTable(new String[0][0], colNames);
         JScrollPane scrollPane = new JScrollPane(equipmentReportTable);
-        scrollPane.setPreferredSize(new Dimension(400,350));
+        scrollPane.setPreferredSize(new Dimension(600,350));
         tablePanel.add(scrollPane);
 
         /* combine center panels */
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.add(filterByPanel);
-        centerPanel.add(scrollPane);
+        centerPanel.add(tablePanel);
 
         /* combine all panels */
         add(titlePanel, BorderLayout.NORTH);
@@ -141,6 +138,80 @@ public class EquipmentReport extends JPanel {
         return backRepsButton;
     }
 
+    /* gets filter button */
+    public JButton getFilterButton() {
+        return filterButton;
+    }
 
+    /* table contents */
+    public void setTableData(String[][] data, String[] columnNames) {
+        equipmentReportTable = new JTable(data, columnNames);
+        JScrollPane scrollPane = new JScrollPane(equipmentReportTable);
+        scrollPane.setPreferredSize(new Dimension(600, 350));
 
+        tablePanel.removeAll();
+        tablePanel.add(scrollPane);
+        tablePanel.revalidate();
+        tablePanel.repaint();
+
+    }
+
+    /* filters */
+    public int getSelectedMonth() {
+        return monthField.getSelectedIndex() + 1;
+    }
+
+    public int getSelectedYear() {
+        if (yearField.getSelectedItem() == null) {
+            return -1;
+        }
+        String selectedYear = yearField.getSelectedItem().toString();
+
+        try {
+            return Integer.parseInt(selectedYear);
+        }
+        catch (NumberFormatException e) {
+            return 2025;
+        }
+
+    }
+
+    public int getSelectedEquipmentID() {
+        // 0 = all
+        if (equipmentField.getSelectedItem() == null) {
+            return 0;
+        }
+        // "id - name" or "all equpiment"
+        String select = equipmentField.getSelectedItem().toString();
+        if (select.equals("All Equipment")) {
+            return 0;
+        }
+        
+        if (select.contains(" - ")) {
+            try {
+                return Integer.parseInt(select.split(" - ")[0]);
+            } catch (NumberFormatException e) {
+            }
+        }
+        return 0;
+    }
+
+    //populate
+    public void setYearOptions(String[] years) {
+        yearField.removeAllItems();
+        for (String year : years) 
+            yearField.addItem(year);
+        
+        if (years.length > 0) 
+            yearField.setSelectedItem(years[0]);
+    }
+
+    public void setEquipmentOptions(String[] equipments) {
+        equipmentField.removeAllItems();
+        equipmentField.addItem("All Equipment");
+
+        for (String e : equipments)
+            equipmentField.addItem(e);
+        equipmentField.setSelectedIndex(0);
+    }
 }

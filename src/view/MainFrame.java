@@ -200,6 +200,9 @@ public class MainFrame extends JFrame {
     /*leads to equipment utilization reports pane */
     public void showEquipmentReportsPane() {
         cardLayout.show(mainPanel, "equipment report");
+                controller.loadEquipmentReportOptions(equipmentReport);
+        controller.refreshEquipmentReport(equipmentReport);
+        equipmentReport.getFilterButton().addActionListener(e -> controller.refreshEquipmentReport(equipmentReport));
     }
 
     /* leads to employee deployment reports page */

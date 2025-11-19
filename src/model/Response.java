@@ -300,4 +300,89 @@ public class Response {
         }
         return reportData;
     }
+
+    /* Equipment report helpers */
+    public List<String> getEquipmentList() {
+        List<String> list = new ArrayList<>();
+        
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "mysqlrootpass");
+            PreparedStatement pstmt = conn.prepareStatement("SELECT equipment_id, equipment_name FROM equipment ORDER BY equipment_name ASC");
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                list.add(rs.getInt("equipment_id") + " - " + rs.getString("equipment_name"));
+            }
+            rs.close();
+            pstmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return list;
+    }
+
+    public List<Integer> getAvailableYearsForEquipment() {
+        List<Integer> years = new ArrayList<>();
+        
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "mysqlrootpass");
+            PreparedStatement pstmt = conn.prepareStatement("SELECT DISTINCT YEAR(date_lent) AS y FROM response_equipment WHERE date_lent IS NOT NULL ORDER BY y DESC");
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                years.add(rs.getInt("y"));
+            }
+            rs.close();
+            pstmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return years;
+    }
+
+    public List<String[]> getEquipmentUtilizationReport(int year, int month, int equipmentId) {
+        List<String[]> reportData = new ArrayList<>();
+
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "mysqlrootpass");
+
+            // time bounds
+            java.time.YearMonth ym = java.time.YearMonth.of(year, month);
+            java.time.LocalDate start = ym.atDay(1);
+            java.time.LocalDate end = ym.atEndOfMonth();
+            String sql = "SELECT e.equipment_id, e.equipment_name AS equipment, COUNT(re.response_id) AS total_uses, SUM(re.quantity_used) " +
+            "AS total_qty_lent, AVG (re.quantity_used) AS avg_qty_per_use, e.quantity_per_name AS current_stock, e.availability AS availability "+ 
+            "FROM equipment e LEFT JOIN response_equipment re ON re.equipment_id = e.equipment_id AND re.date_lent BETWEEN ? AND ? " +
+            "WHERE (? = 0 OR e.equipment_id = ?) GROUP BY e.equipment_id, e.equipment_name, e.quantity_per_name, e.availability ORDER BY total_uses DESC, e.equipment_name ASC";
+                    
+            PreparedStatement ps = conn.prepareStatement(sql);
+            //month start, month end, all equipment, equipment id
+            ps.setDate(1, java.sql.Date.valueOf(start));
+            ps.setDate(2, java.sql.Date.valueOf(end));
+            ps.setInt(3, equipmentId);
+            ps.setInt(4, equipmentId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String[] row = new String[] {
+                    rs.getString("equipment"),
+                    String.valueOf(rs.getInt("total_uses")),
+                    String.valueOf(rs.getInt("total_qty_lent")),
+                    String.format("%.2f", rs.getDouble("avg_qty_per_use")),
+                    String.valueOf(rs.getInt("current_stock")),
+                    rs.getString("availability")};
+
+                    reportData.add(row);
+            }
+            rs.close();
+            ps.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return reportData;
+    }
 }

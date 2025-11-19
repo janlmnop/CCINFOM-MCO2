@@ -87,7 +87,7 @@ public class Employee extends Person {
             Connection conn;
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
 
-            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM employee WHERE employee_id = ? AND password = ?");
+            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM employee WHERE employee_id = ? AND 'password' = ?");
 
             pstmt.setInt(1, employeeID);
             pstmt.setString(2, password);
