@@ -7,6 +7,7 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 public class ResponseReport extends JPanel {
     /* attributes */
@@ -26,6 +27,7 @@ public class ResponseReport extends JPanel {
     private JLabel monthLabel = new JLabel();
     private JLabel yearLabel = new JLabel();
     private JLabel disasterLabel = new JLabel();
+    private JLabel averageLabel = new JLabel();
 
     private JComboBox<String> monthField = new JComboBox<String>(months);
     private JComboBox<String> yearField = new JComboBox<String>();
@@ -111,9 +113,11 @@ public class ResponseReport extends JPanel {
         gbcSpecs.gridy = 1;
         filterByPanel.add(filterButton, gbcSpecs);
 
-        /* stats panel -- will see if I'll add this pa */
+        /* stats panel */
         JPanel statsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        statsPanel.setBorder(BorderFactory.createTitledBorder("Summary Statistics"));
+        statsPanel.setBorder(BorderFactory.createTitledBorder("Statistics"));
+        // averageLabel.setText(this.getAverage());
+        statsPanel.add(averageLabel);
 
         /* table panel */
         responseReportTable = new JTable(data, colNames);
@@ -125,7 +129,7 @@ public class ResponseReport extends JPanel {
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.add(filterByPanel);
-        // centerPanel.add(statsPanel);
+        centerPanel.add(statsPanel);
         centerPanel.add(tablePanel);
 
 
@@ -210,4 +214,14 @@ public class ResponseReport extends JPanel {
         if (disasters.length > 0)
             disasterField.setSelectedItem(disasters[0]);
     }
+
+    /* updates the average label */
+    public void setAverage(double average) {
+        averageLabel.setText(String.format("Average Residents Rescued per Disaster: %.2f", average));
+    }
+
+    /* LISTENER */
+    public void setActionListener(ActionListener listener) {
+        filterButton.addActionListener(listener);
+    }  
 }

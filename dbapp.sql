@@ -1,3 +1,5 @@
+-- INIT DUMP
+
 CREATE DATABASE  IF NOT EXISTS `dbapp` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `dbapp`;
 
@@ -115,7 +117,10 @@ CREATE TABLE response (
 -- drop data into response table
 INSERT INTO response VALUES
 (1, 1, 1, 1, "RS", "2025-08-21 13:02:21", "2025-08-21 15:11:04"),
-(2, 2, 2, 2, "E", "2024-02-14 07:27:30", "2024-02-20 08:01:25");
+(2, 2, 2, 2, "E", "2024-02-14 07:27:30", "2024-02-20 08:01:25"),
+(3, 3, 1, 2, "RS", "2025-01-15 08:00:00", "2025-01-15 18:00:00"),
+(4, 3, 1, 3, "RS", "2025-01-15 09:00:00", "2025-01-15 17:00:00"),
+(5, 4, 2, 1, "RS", "2025-01-20 10:00:00", "2025-01-20 20:00:00");
 
 
 -- ----------------------------------------
@@ -128,6 +133,14 @@ CREATE TABLE response_resident (
     PRIMARY KEY (response_id, resident_id),
     FOREIGN KEY (response_id) REFERENCES response(response_id),
     FOREIGN KEY (resident_id) REFERENCES resident(resident_id));
+
+-- drop data into response_resident
+INSERT INTO response_resident (response_id, resident_id, role) VALUES
+(3, 1, 'rescued'),
+(3, 2, 'rescued'),
+(4, 3, 'rescued'),
+(5, 1, 'rescued'),
+(5, 2, 'rescued');
 
 
 -- ----------------------------------------
@@ -143,7 +156,6 @@ CREATE TABLE response_equipment (
     PRIMARY KEY (response_id, equipment_id),
     FOREIGN KEY (response_id) REFERENCES response(response_id),
     FOREIGN KEY (equipment_id) REFERENCES equipment(equipment_id));
-
 
 -- ----------------------------------------
 -- disaster table
@@ -161,6 +173,9 @@ CREATE TABLE disaster (
 -- drop data into disaster table
 INSERT INTO disaster VALUES
 (1, "Typhoon", "2025-02-03", "One Corporate Plaza 1200", "L", 5, 50000),
-(2, "Fire", "2024-09-21", "123 Timothy Street", "S", 0, 7500);
+(2, "Fire", "2024-09-21", "123 Timothy Street", "S", 0, 7500),
+(3, "Flood", "2025-01-15", "342 Oak Street", "M", 2, 50000),
+(4, "Earthquake", "2025-01-20", "123 Timothy Street", "H", 5, 100000),
+(5, "Typhoon", "2023-01-25", "714 Shaw Street", "L", 1, 75000);
 
 

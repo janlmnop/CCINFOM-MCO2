@@ -97,25 +97,34 @@ public class Response {
     }
     
     /* REPORT GENERATION */
-    public List<String[]> getRescueReportByMonth(int year, int month) {
+    public List<String[]> getRescueReportByMonth(int year, int month, String disasterType) {
         List<String[]> reportData = new ArrayList<>();
         
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
-            // multiple line query
-            String query = """
+            StringBuilder query = new StringBuilder("""
                 SELECT d.disaster_id, d.disaster_type, d.date_occurred, d.location, COUNT(rr.resident_id) AS total_residents_rescued
                 FROM disaster d
                 LEFT JOIN response res ON d.disaster_id = res.disaster_id
                 LEFT JOIN response_resident rr ON res.response_id = rr.response_id
                 WHERE YEAR(d.date_occurred) = ? AND MONTH(d.date_occurred) = ?
-                GROUP BY d.disaster_id, d.disaster_type, d.date_occurred, d.location
-                ORDER BY total_residents_rescued DESC
-                """;
-                
-            PreparedStatement pstmt = conn.prepareStatement(query);
+                """);
+            
+            // add disaster type filter if not "All Disasters"
+            if (disasterType != null && !disasterType.equals("All Disasters")) {
+                query.append(" AND d.disaster_type = ?");
+            }
+            
+            query.append(" GROUP BY d.disaster_id, d.disaster_type, d.date_occurred, d.location ORDER BY total_residents_rescued DESC");
+            
+            PreparedStatement pstmt = conn.prepareStatement(query.toString());
             pstmt.setInt(1, year);
             pstmt.setInt(2, month);
+            
+            // set disaster type parameter if needed
+            if (disasterType != null && !disasterType.equals("All Disasters")) {
+                pstmt.setString(3, disasterType);
+            }
             
             ResultSet rs = pstmt.executeQuery();
             
@@ -140,25 +149,37 @@ public class Response {
         return reportData;
     }
     
-    public double getAverageRescuedPerDisaster(int year, int month) {
+    public double getAverageRescuedPerDisaster(int year, int month, String disasterType) {
         double average = 0;
         
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
-            String query = """
+            
+            // Build the query dynamically based on filters
+            StringBuilder query = new StringBuilder("""
                 SELECT AVG(resident_count) AS avg_residents_per_disaster
                 FROM (SELECT d.disaster_id, COUNT(rr.resident_id) AS resident_count
                     FROM disaster d
                     LEFT JOIN response res ON d.disaster_id = res.disaster_id
                     LEFT JOIN response_resident rr ON res.response_id = rr.response_id
                     WHERE YEAR(d.date_occurred) = ? AND MONTH(d.date_occurred) = ?
-                    GROUP BY d.disaster_id
-                ) disaster_stats
-                """;
-                
-            PreparedStatement pstmt = conn.prepareStatement(query);
+                """);
+            
+            // Add disaster type filter if not "All Disasters"
+            if (disasterType != null && !disasterType.equals("All Disasters")) {
+                query.append(" AND d.disaster_type = ?");
+            }
+            
+            query.append(" GROUP BY d.disaster_id) disaster_stats");
+            
+            PreparedStatement pstmt = conn.prepareStatement(query.toString());
             pstmt.setInt(1, year);
             pstmt.setInt(2, month);
+            
+            // Set disaster type parameter if needed
+            if (disasterType != null && !disasterType.equals("All Disasters")) {
+                pstmt.setString(3, disasterType);
+            }
             
             ResultSet rs = pstmt.executeQuery();
             
@@ -170,7 +191,7 @@ public class Response {
             pstmt.close();
             
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error calculating average: " + e.getMessage());
         }
         
         return average;

@@ -45,6 +45,7 @@ public class Controller implements ActionListener, DocumentListener {
         reShelter.getReleaseButton().addActionListener(this);
         bEquip.getBorrowButton().addActionListener(this);
         rEquip.getReturnButton().addActionListener(this);
+        rRep.getFilterButton().addActionListener(this);
 
         // back button action listeners
         logEM.getLoginExitButton().addActionListener(this);
@@ -541,7 +542,7 @@ public class Controller implements ActionListener, DocumentListener {
         }
     }
 
-    public int borrowEquipment(String item, String qty, String borrower, String date) {
+   public int borrowEquipment(String item, String qty, String borrower, String date) {
         try {
             Equipment thisEquipment = new Equipment();
 
@@ -562,7 +563,7 @@ public class Controller implements ActionListener, DocumentListener {
             pstmt.setString(2, item);
             pstmt.executeUpdate();
 
-            pstmt = conn.prepareStatement("UPDATE equipment SET availability='Not Available' WHERE equipment_name LIKE ? && quantity_per_name<0"); 
+            pstmt = conn.prepareStatement("UPDATE equipment SET availability='Not Available' WHERE equipment_name LIKE ? && quantity_per_name<1"); 
             pstmt.setString(1, item);
             pstmt.executeUpdate();
 
@@ -801,14 +802,21 @@ public class Controller implements ActionListener, DocumentListener {
 
         int year = rRep.getSelectedYear();
         int month = rRep.getSelectedMonth();
+        String disasterType = rRep.getSelectedDisasterType();
         
-        List<String[]> reportData = thisResponse.getRescueReportByMonth(year, month);
+        // pass all three filters to the method
+        List<String[]> reportData = thisResponse.getRescueReportByMonth(year, month, disasterType);
         
         // convert to 2D array for table
         String[][] dataArray = reportData.toArray(new String[0][]);
         String[] columnNames = {"Disaster ID", "Disaster Type", "Date Occurred", "Location", "Residents Rescued"};
         rRep.setTableData(dataArray, columnNames);
 
-        System.out.println("Average: " + thisResponse.getAverageRescuedPerDisaster(year, month));
+        // update the average
+        double average = thisResponse.getAverageRescuedPerDisaster(year, month, disasterType);
+        rRep.setAverage(average);
+
+
+        // System.out.println("Average: " + thisResponse.getAverageRescuedPerDisaster(year, month));
     }
 }
