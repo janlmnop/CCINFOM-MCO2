@@ -219,7 +219,6 @@ public class Response {
         List<String[]> reportData = new ArrayList<>();
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
-
             // Prepare shelter list (either single shelter or all shelters)
             String shelterQuery = "SELECT shelter_id, shelter_name, capacity FROM shelter" + (shelterId > 0 ? " WHERE shelter_id = ?" : "") + " ORDER BY shelter_name ASC";
             PreparedStatement psShel = conn.prepareStatement(shelterQuery);
@@ -238,43 +237,54 @@ public class Response {
                 String sname = rsShel.getString("shelter_name");
                 int cap = rsShel.getInt("capacity");
 
-                // Fetch all responses for this shelter that overlap the month
-                String respQuery = "SELECT r.response_id, r.response_start, r.response_end "
-                                  + "FROM response r "
-                                  + "WHERE r.shelter_id = ? AND r.response_start <= ? AND r.response_end >= ?";
-                PreparedStatement psResp = conn.prepareStatement(respQuery);
-                psResp.setInt(1, sid);
-                psResp.setTimestamp(2, java.sql.Timestamp.valueOf(monthEndDt));
-                psResp.setTimestamp(3, java.sql.Timestamp.valueOf(monthStartDt));
-                ResultSet rsResp = psResp.executeQuery();
-
-                // collect resident intervals (residentId, start, end)
+                // collect resident intervals by using evacuation response_start as the start
+                // and preferring a linked 'released' response's response_start as the end.
                 class Interval { int residentId; java.time.LocalDateTime start; java.time.LocalDateTime end; }
                 List<Interval> intervals = new ArrayList<>();
 
-                while (rsResp.next()) {
-                    int rid = rsResp.getInt("response_id");
-                    java.sql.Timestamp tsStart = rsResp.getTimestamp("response_start");
-                    java.sql.Timestamp tsEnd = rsResp.getTimestamp("response_end");
-                    java.time.LocalDateTime start = tsStart != null ? tsStart.toLocalDateTime() : monthStartDt;
-                    java.time.LocalDateTime end = tsEnd != null ? tsEnd.toLocalDateTime() : monthEndDt;
+                // include any evacuation that started on or before the month end
+                // (do NOT filter by response_end here — we compute end from linked 'released' or use now)
+                String evacQuery = "SELECT rr.resident_id, r.response_id, r.response_start, r.response_end "
+                    + "FROM response_resident rr JOIN response r ON rr.response_id = r.response_id "
+                    + "WHERE rr.role = 'evacuated' AND r.shelter_id = ? AND r.response_start <= ?";
+                PreparedStatement psEvac = conn.prepareStatement(evacQuery);
+                psEvac.setInt(1, sid);
+                psEvac.setTimestamp(2, java.sql.Timestamp.valueOf(monthEndDt));
+                ResultSet rsEvac = psEvac.executeQuery();
 
-                    // get residents for this response with role 'evacuated'
-                    PreparedStatement psRR = conn.prepareStatement("SELECT resident_id FROM response_resident WHERE response_id = ? AND role = 'evacuated'");
-                    psRR.setInt(1, rid);
-                    ResultSet rsRR = psRR.executeQuery();
-                    while (rsRR.next()) {
-                        Interval iv = new Interval();
-                        iv.residentId = rsRR.getInt("resident_id");
-                        iv.start = start;
-                        iv.end = end;
-                        intervals.add(iv);
+                while (rsEvac.next()) {
+                    Interval iv = new Interval();
+                    iv.residentId = rsEvac.getInt("resident_id");
+                    java.sql.Timestamp tsStart = rsEvac.getTimestamp("response_start");
+                    rsEvac.getTimestamp("response_end"); // ignore stored response_end for open intervals
+                    iv.start = tsStart != null ? tsStart.toLocalDateTime() : monthStartDt;
+                    iv.end = null; // prefer a linked 'released' response; if none, we'll use now
+
+                    // prefer a linked 'released' response's response_start as the end time
+                    PreparedStatement psRel = conn.prepareStatement(
+                        "SELECT r2.response_start FROM response r2 JOIN response_resident rr2 ON r2.response_id = rr2.response_id "
+                        + "WHERE rr2.resident_id = ? AND rr2.role = 'released' AND r2.shelter_id = ? AND r2.response_start >= ? "
+                        + "ORDER BY r2.response_start ASC LIMIT 1");
+                    psRel.setInt(1, iv.residentId);
+                    psRel.setInt(2, sid);
+                    psRel.setTimestamp(3, java.sql.Timestamp.valueOf(iv.start));
+                    ResultSet rsRel = psRel.executeQuery();
+                    if (rsRel.next()) {
+                        java.sql.Timestamp relTs = rsRel.getTimestamp("response_start");
+                        if (relTs != null) iv.end = relTs.toLocalDateTime();
                     }
-                    rsRR.close();
-                    psRR.close();
+                    rsRel.close();
+                    psRel.close();
+
+                    // fallback: if still null, use the current datetime (count up to today)
+                    if (iv.end == null) {
+                        iv.end = java.time.LocalDateTime.now();
+                    }
+
+                    intervals.add(iv);
                 }
-                rsResp.close();
-                psResp.close();
+                rsEvac.close();
+                psEvac.close();
 
                 // total distinct residents who were present at least one day in the month
                 Set<Integer> distinctResidents = new HashSet<>();

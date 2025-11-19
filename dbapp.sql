@@ -127,9 +127,9 @@ INSERT INTO response VALUES
 -- response_resident junction table
 -- ----------------------------------------
 CREATE TABLE response_resident (
-	response_id int(10) NOT NULL,
+    response_id int(10) NOT NULL,
     resident_id int(10) NOT NULL,
-    role enum("rescued", "evacuated", "injured", "volunteer") NOT NULL,
+    role enum("rescued", "evacuated", "injured", "volunteer", "released") NOT NULL,
     PRIMARY KEY (response_id, resident_id),
     FOREIGN KEY (response_id) REFERENCES response(response_id),
     FOREIGN KEY (resident_id) REFERENCES resident(resident_id));
@@ -141,7 +141,6 @@ INSERT INTO response_resident (response_id, resident_id, role) VALUES
 (4, 3, 'rescued'),
 (5, 1, 'rescued'),
 (5, 2, 'rescued');
-
 
 -- ----------------------------------------
 -- response_equipment junction table
@@ -179,3 +178,18 @@ INSERT INTO disaster VALUES
 (5, "Typhoon", "2023-01-25", "714 Shaw Street", "L", 1, 75000);
 
 
+-- Sample shelter report data:
+-- 1) Resident 1 evacuated to shelter 1 on 2025-11-10 and released on 2025-11-12
+-- 2) Resident 3 evacuated to shelter 3 on 2025-11-15 and still in shelter (no release)
+
+-- responses for sample events
+INSERT INTO response VALUES
+(6, 3, 1, 3, "E", "2025-11-10 09:00:00", "2025-11-10 09:00:00"),
+(7, 3, 1, 2, "RL", "2025-11-12 10:00:00", "2025-11-12 10:00:00"),
+(8, 4, 3, 3, "E", "2025-10-15 08:30:00", "2025-10-15 08:30:00");
+
+-- response_resident mappings for sample events
+INSERT INTO response_resident (response_id, resident_id, role) VALUES
+(6, 1, 'evacuated'),
+(7, 1, 'released'),
+(8, 3, 'evacuated');

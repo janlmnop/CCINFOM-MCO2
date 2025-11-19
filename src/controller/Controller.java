@@ -717,10 +717,19 @@ public class Controller implements ActionListener, DocumentListener {
             pstmt.executeUpdate();
             pstmt.close();
 
-            // 6. remove evacuated resident entry (free occupant)
-            pstmt = conn.prepareStatement("DELETE rr FROM response_resident rr JOIN response r ON rr.response_id = r.response_id WHERE rr.resident_id = ? AND r.shelter_id = ? AND rr.role = 'evacuated'");
-            pstmt.setInt(1, residentIdInt);
-            pstmt.setInt(2, shelterIdInt);
+            // 6. link the release record to the resident so reports can use the release response_start
+            pstmt = conn.prepareStatement("INSERT INTO response_resident (response_id, resident_id, role) VALUES (?, ?, 'released')");
+            pstmt.setInt(1, thisResponse.getResponseID());
+            pstmt.setInt(2, residentIdInt);
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            // 7. update the original evacuation response end time so the history remains
+            //    (keep the evacuated mapping and set its end time)
+            pstmt = conn.prepareStatement("UPDATE response r JOIN response_resident rr ON r.response_id = rr.response_id SET r.response_end = ? WHERE rr.resident_id = ? AND r.shelter_id = ? AND rr.role = 'evacuated'");
+            pstmt.setString(1, dateTime);
+            pstmt.setInt(2, residentIdInt);
+            pstmt.setInt(3, shelterIdInt);
             pstmt.executeUpdate();
             pstmt.close();
 
