@@ -337,7 +337,7 @@ public class Response {
         List<String> list = new ArrayList<>();
         
         try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "mysqlrootpass");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
             PreparedStatement pstmt = conn.prepareStatement("SELECT equipment_id, equipment_name FROM equipment ORDER BY equipment_name ASC");
             ResultSet rs = pstmt.executeQuery();
 
@@ -357,7 +357,7 @@ public class Response {
         List<Integer> years = new ArrayList<>();
         
         try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "mysqlrootpass");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
             PreparedStatement pstmt = conn.prepareStatement("SELECT DISTINCT YEAR(date_lent) AS y FROM response_equipment WHERE date_lent IS NOT NULL ORDER BY y DESC");
             ResultSet rs = pstmt.executeQuery();
 
@@ -378,7 +378,7 @@ public class Response {
         List<String[]> reportData = new ArrayList<>();
 
         try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "mysqlrootpass");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbapp", "root", "Caf3Latt3");
 
             // time bounds
             java.time.YearMonth ym = java.time.YearMonth.of(year, month);
